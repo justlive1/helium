@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: http-server
+  profiles:
+    active: dev
+
+logging:
+  file: logs/${spring.application.name}.log
+  level:
+    root: info

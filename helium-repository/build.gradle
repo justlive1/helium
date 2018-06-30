@@ -15,8 +15,8 @@ apply plugin: 'io.spring.dependency-management'
 
 dependencies {
 
-    compile("org.springframework.boot:spring-boot-starter-web")
-
-    compile project(':helium-repository')
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("com.h2database:h2")
 
 }
+

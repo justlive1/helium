@@ -4,7 +4,6 @@ allprojects {
     apply plugin: "idea"
     apply plugin: "eclipse"
     apply plugin: "maven"
-
 }
 
 subprojects {
@@ -17,11 +16,11 @@ subprojects {
         mavenLocal()
         maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
         mavenCentral()
-        jcenter()
     }
 
     dependencies {
         api libraries.commons
+        testCompile libraries.test
     }
 
     jar {

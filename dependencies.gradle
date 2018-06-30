@@ -31,6 +31,10 @@ ext.libraries = [
                 dependencies.create("vip.justlive:snow-common-web-vertx:$snowVersion") {
                     force = true
                 }
+        ],
+
+        test       : [
+                dependencies.create("junit:junit:$junitVersion")
         ]
 ]
 
