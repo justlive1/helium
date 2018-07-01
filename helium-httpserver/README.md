@@ -8,4 +8,4 @@ http服务
   - 小文件上传、下载接
   
 ### 实现
-  先用spring boot简单实现
+  用vertx简单实现

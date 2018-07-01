@@ -1,22 +1,23 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-    }
-}
-
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
 
 dependencies {
 
-    compile("org.springframework.boot:spring-boot-starter-web")
+    compile project(':helium-base')
 
-    compile project(':helium-repository')
 
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Title": project.name,
+                "Implementation-Vendor": project.group,
+                "Created-By": project.group,
+                "Implementation-Version": project.version,
+                "Main-Class": "io.vertx.core.Launcher",
+                "Main-Verticle": "vip.justlive.helium.httpserver.verticle.WebVerticle")
+    }
+
+    from {
+
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }

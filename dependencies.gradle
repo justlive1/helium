@@ -34,7 +34,13 @@ ext.libraries = [
         ],
 
         test       : [
-                dependencies.create("junit:junit:$junitVersion")
+                dependencies.create("junit:junit:$junitVersion") {
+                    force = true
+                }
+        ],
+
+        h2         : [
+                dependencies.create("com.h2database:h2:$h2Version")
         ]
 ]
 
