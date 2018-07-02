@@ -4,20 +4,24 @@ import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;
 
 /**
+ * just live
+ *
  * @author wubo
  */
 public final class JustLive extends Launcher {
 
-  private static Vertx vertx;
+  private static Vertx VERTX;
 
   private JustLive() {
   }
 
   /**
+   * get single vertx
+   *
    * @return vertx
    */
   public static Vertx vertx() {
-    return vertx;
+    return VERTX;
   }
 
   /**
@@ -26,11 +30,11 @@ public final class JustLive extends Launcher {
    * @param args the user command line arguments.
    */
   public static void main(String[] args) {
-    new Launcher().dispatch(args);
+    new JustLive().dispatch(args);
   }
 
   @Override
   public void afterStartingVertx(Vertx vertx) {
-    JustLive.vertx = vertx;
+    JustLive.VERTX = vertx;
   }
 }

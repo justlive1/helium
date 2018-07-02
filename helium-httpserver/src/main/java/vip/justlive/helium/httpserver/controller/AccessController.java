@@ -16,7 +16,9 @@ public class AccessController {
   /**
    * 登录
    *
-   * @return
+   * @param username 用户名
+   * @param password 密码
+   * @return json
    */
   @VertxRouteMapping(method = {HttpMethod.GET, HttpMethod.POST}, value = "/login")
   public String login(@VertxRequestParam("username") String username,

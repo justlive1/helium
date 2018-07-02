@@ -7,6 +7,8 @@ import vip.justlive.helium.base.JustLive;
 import vip.justlive.helium.base.config.DataSourceConf;
 
 /**
+ * 数据源工厂
+ *
  * @author wubo
  */
 public class DataSourceFactory {
@@ -15,6 +17,8 @@ public class DataSourceFactory {
   }
 
   /**
+   * 共享jdbcClient
+   *
    * @return jdbcClient
    */
   public static JDBCClient sharedJdbcClient() {

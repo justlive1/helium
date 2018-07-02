@@ -14,6 +14,8 @@ import vip.justlive.common.web.vertx.support.RouteRegisterFactory;
 import vip.justlive.helium.base.config.ServerConf;
 
 /**
+ * web单元
+ *
  * @author wubo
  */
 public class WebVerticle extends AbstractVerticle {
