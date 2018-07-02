@@ -21,6 +21,9 @@ public final class JustLive extends Launcher {
    * @return vertx
    */
   public static Vertx vertx() {
+    if(VERTX == null) {
+      VERTX = Vertx.vertx();
+    }
     return VERTX;
   }
 

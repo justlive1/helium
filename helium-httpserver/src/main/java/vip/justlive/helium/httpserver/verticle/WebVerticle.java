@@ -38,7 +38,7 @@ public class WebVerticle extends AbstractVerticle {
     router.route().handler(BodyHandler.create());
 
     RouteRegisterFactory routeRegisterFactory = new RouteRegisterFactory(router);
-    routeRegisterFactory.execute();
+    routeRegisterFactory.execute("vip.justlive.helium");
 
     ServerConf conf = ConfigFactory.load(ServerConf.class);
 
