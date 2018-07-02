@@ -11,7 +11,7 @@ import java.util.Set;
 import vip.justlive.common.base.constant.BaseConstants;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.support.RouteRegisterFactory;
-import vip.justlive.helium.base.Conf;
+import vip.justlive.helium.base.config.ServerConf;
 
 /**
  * @author wubo
@@ -31,7 +31,6 @@ public class WebVerticle extends AbstractVerticle {
         .add(HttpMethod.POST).add(HttpMethod.OPTIONS).add(HttpMethod.PUT).add(HttpMethod.DELETE)
         .add(HttpMethod.HEAD).build();
 
-    // 添加跨域的方法
     router.route().handler(CorsHandler.create(BaseConstants.ANY).allowedMethods(methods));
     router.route().handler(CookieHandler.create());
     router.route().handler(BodyHandler.create());
@@ -39,7 +38,7 @@ public class WebVerticle extends AbstractVerticle {
     RouteRegisterFactory routeRegisterFactory = new RouteRegisterFactory(router);
     routeRegisterFactory.execute();
 
-    Conf conf = ConfigFactory.load(Conf.class);
+    ServerConf conf = ConfigFactory.load(ServerConf.class);
 
     vertx.createHttpServer().requestHandler(router::accept).listen(conf.getPort());
 

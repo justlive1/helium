@@ -6,6 +6,9 @@ ext.libraries = [
                 },
                 dependencies.create("io.vertx:vertx-unit:$vertxVersion") {
                     force = true
+                },
+                dependencies.create("io.vertx:vertx-jdbc-client:$vertxVersion") {
+                    force = true
                 }
         ],
 
@@ -41,6 +44,10 @@ ext.libraries = [
 
         h2         : [
                 dependencies.create("com.h2database:h2:$h2Version")
+        ],
+
+        mysql      : [
+                dependencies.create("mysql:mysql-connector-java:$mysqlVersion")
         ]
 ]
 

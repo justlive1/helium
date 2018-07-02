@@ -3,5 +3,7 @@ dependencies {
     compile libraries.earthcommon
     compile libraries.logging
     compile libraries.vertx
+    compile libraries.h2
 
+    compile "com.zaxxer:HikariCP:$hikariCPVersion"
 }

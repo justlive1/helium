@@ -1,4 +1,3 @@
-
 dependencies {
 
     compile project(':helium-base')
@@ -8,16 +7,11 @@ dependencies {
 
 jar {
     manifest {
-        attributes("Implementation-Title": project.name,
-                "Implementation-Vendor": project.group,
-                "Created-By": project.group,
-                "Implementation-Version": project.version,
-                "Main-Class": "io.vertx.core.Launcher",
-                "Main-Verticle": "vip.justlive.helium.httpserver.verticle.WebVerticle")
+        attributes "Main-Class": "vip.justlive.helium.base.JustLive"
+        attributes "Main-Verticle": "vip.justlive.helium.httpserver.verticle.WebVerticle"
     }
 
     from {
-
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }

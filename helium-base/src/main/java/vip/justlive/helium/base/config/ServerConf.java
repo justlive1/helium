@@ -1,15 +1,13 @@
-package vip.justlive.helium.base;
+package vip.justlive.helium.base.config;
 
 import lombok.Data;
 import vip.justlive.common.base.annotation.Value;
 
 /**
- * 配置
- *
  * @author wubo
  */
 @Data
-public class Conf {
+public class ServerConf {
 
   @Value("${server.port:8080}")
   private Integer port;
