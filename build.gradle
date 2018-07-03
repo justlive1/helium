@@ -1,45 +1,54 @@
 apply from: rootProject.file("dependencies.gradle")
 
 allprojects {
-    apply plugin: "idea"
-    apply plugin: "eclipse"
-    apply plugin: "maven"
+  apply plugin: "idea"
+  apply plugin: "eclipse"
+  apply plugin: "maven"
+
+  repositories {
+    mavenLocal()
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+    mavenCentral()
+  }
+
 }
 
 subprojects {
 
-    apply plugin: "java-library"
+  apply plugin: 'java'
+  apply plugin: "java-library"
 
-    ext.libraries = rootProject.ext.libraries
+  ext.libraries = rootProject.ext.libraries
 
-    repositories {
-        mavenLocal()
-        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
-        mavenCentral()
+  compileJava.options.encoding = 'UTF-8'
+
+  javadoc {
+    options.charSet = "UTF-8"
+    options.encoding = "UTF-8"
+  }
+
+  jar {
+    manifest {
+      attributes("Implementation-Title": project.name,
+        "Implementation-Vendor": project.group,
+        "Created-By": project.group,
+        "Implementation-Version": project.version)
     }
+  }
 
-    jar {
-        manifest {
-            attributes("Implementation-Title": project.name,
-                    "Implementation-Vendor": project.group,
-                    "Created-By": project.group,
-                    "Implementation-Version": project.version)
-        }
-    }
+  task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+  }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from 'build/docs/javadoc'
-    }
+  task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
 
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives jar
-        archives javadocJar
-        archives sourcesJar
-    }
+  artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+  }
 }
