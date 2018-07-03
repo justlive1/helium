@@ -1,54 +1,57 @@
 ext.libraries = [
 
-        vertx      : [
-                dependencies.create("io.vertx:vertx-core:$vertxVersion") {
-                    force = true
-                },
-                dependencies.create("io.vertx:vertx-unit:$vertxVersion") {
-                    force = true
-                },
-                dependencies.create("io.vertx:vertx-jdbc-client:$vertxVersion") {
-                    force = true
-                }
-        ],
+  vertx      : [
+    dependencies.create("io.vertx:vertx-core:$vertxVersion") {
+      force = true
+    },
+    dependencies.create("io.vertx:vertx-unit:$vertxVersion") {
+      force = true
+    },
+    dependencies.create("io.vertx:vertx-jdbc-client:$vertxVersion") {
+      force = true
+    },
+    dependencies.create("io.vertx:vertx-auth-jdbc:$vertxVersion") {
+      force = true
+    }
+  ],
 
-        commons    : [
-                dependencies.create("com.google.guava:guava:$guavaVersion") {
-                    force = true
-                },
-                dependencies.create("org.projectlombok:lombok:$lombokVersion") {
-                    force = true
-                }
-        ],
+  commons    : [
+    dependencies.create("com.google.guava:guava:$guavaVersion") {
+      force = true
+    },
+    dependencies.create("org.projectlombok:lombok:$lombokVersion") {
+      force = true
+    }
+  ],
 
-        logging    : [
-                dependencies.create("org.slf4j:slf4j-api:$log4jVersion") {
-                    force = true
-                },
-                dependencies.create("ch.qos.logback:logback-classic:$logbackVersion") {
-                    force = true
-                }
-        ],
+  logging    : [
+    dependencies.create("org.slf4j:slf4j-api:$log4jVersion") {
+      force = true
+    },
+    dependencies.create("ch.qos.logback:logback-classic:$logbackVersion") {
+      force = true
+    }
+  ],
 
-        earthcommon: [
-                dependencies.create("vip.justlive:snow-common-web-vertx:$snowVersion") {
-                    force = true
-                }
-        ],
+  earthcommon: [
+    dependencies.create("vip.justlive:snow-common-web-vertx:$snowVersion") {
+      force = true
+    }
+  ],
 
-        test       : [
-                dependencies.create("junit:junit:$junitVersion") {
-                    force = true
-                }
-        ],
+  test       : [
+    dependencies.create("junit:junit:$junitVersion") {
+      force = true
+    }
+  ],
 
-        h2         : [
-                dependencies.create("com.h2database:h2:$h2Version")
-        ],
+  sqlite     : [
+    dependencies.create("org.xerial:sqlite-jdbc:$sqliteVersion")
+  ],
 
-        mysql      : [
-                dependencies.create("mysql:mysql-connector-java:$mysqlVersion")
-        ]
+  mysql      : [
+    dependencies.create("mysql:mysql-connector-java:$mysqlVersion")
+  ]
 ]
 
 

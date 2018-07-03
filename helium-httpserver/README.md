@@ -9,3 +9,17 @@ http服务
   
 ### 实现
   用vertx简单实现
+  
+  
+### 开发
+
+idea/eclipse 运行
+- 增加Application类型的启动配置
+- Main class：vip.justlive.helium.base.JustLive
+- Program args: run vip.justlive.helium.httpserver.verticle.WebVerticle
+
+
+build
+- mac: gradlew build
+- win: gradlew.bat build
+

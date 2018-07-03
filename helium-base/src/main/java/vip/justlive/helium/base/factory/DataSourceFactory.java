@@ -1,4 +1,4 @@
-package vip.justlive.helium.base.datasource;
+package vip.justlive.helium.base.factory;
 
 import com.google.common.collect.Maps;
 import io.vertx.core.json.JsonObject;
@@ -28,7 +28,6 @@ public class DataSourceFactory {
   public static JDBCClient sharedJdbcClient() {
     DataSourceConf conf = ConfigFactory.load(DataSourceConf.class);
     JsonObject json = JsonObject.mapFrom(conf);
-    json.put("provider_class", conf.getProviderClass());
     return JDBCClient.createShared(JustLive.vertx(), json);
   }
 
@@ -38,11 +37,21 @@ public class DataSourceFactory {
    * @return jdbcClient
    */
   public static JDBCClient sharedSingleJdbcClient() {
+    return sharedSingleJdbcClient(DataSourceFactory.class);
+  }
+
+  /**
+   * 共享单例jdbcClient
+   *
+   * @param clazz 类
+   * @return jdbcClient
+   */
+  public static JDBCClient sharedSingleJdbcClient(Class<?> clazz) {
     JDBCClient client = CLIENTS.get(DataSourceFactory.class);
     if (client == null) {
-      CLIENTS.putIfAbsent(DataSourceFactory.class, sharedJdbcClient());
+      CLIENTS.putIfAbsent(clazz, sharedJdbcClient());
     }
-    return CLIENTS.get(DataSourceFactory.class);
+    return CLIENTS.get(clazz);
   }
 
 }

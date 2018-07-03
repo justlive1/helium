@@ -1,5 +1,6 @@
 package vip.justlive.helium.base.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import vip.justlive.common.base.annotation.Value;
 
@@ -14,6 +15,7 @@ public class DataSourceConf {
   /**
    * 数据源提供类
    */
+  @JsonProperty("provider_class")
   @Value("${datasource.providerClass}")
   private String providerClass;
 
