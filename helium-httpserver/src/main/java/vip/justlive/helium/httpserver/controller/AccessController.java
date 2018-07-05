@@ -2,6 +2,7 @@ package vip.justlive.helium.httpserver.controller;
 
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
+import vip.justlive.common.base.domain.Response;
 import vip.justlive.common.web.vertx.annotation.VertxRequestParam;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
@@ -37,6 +38,11 @@ public class AccessController {
         ctx.response().end(String.valueOf(result != null && !result.isEmpty()));
       }
     );
+  }
+
+  @VertxRouteMapping(value = "/token")
+  public Response<String> token() {
+    return Response.success("t");
   }
 
 
