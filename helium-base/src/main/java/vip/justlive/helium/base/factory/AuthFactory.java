@@ -1,11 +1,13 @@
 package vip.justlive.helium.base.factory;
 
-import com.google.common.collect.Lists;
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.KeyStoreOptions;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.handler.AuthHandler;
 import io.vertx.ext.web.handler.BasicAuthHandler;
-import java.util.List;
+import io.vertx.ext.web.handler.JWTAuthHandler;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.helium.base.JustLive;
 import vip.justlive.helium.base.config.AuthConf;
@@ -31,7 +33,11 @@ public class AuthFactory {
     AuthProvider authProvider = null;
     switch (providerType) {
       case JDBC: {
-        authProvider = JDBCAuth.create(JustLive.vertx(), DataSourceFactory.sharedJdbcClient());
+        authProvider = jdbcAuth();
+        break;
+      }
+      case JWT: {
+        authProvider = jwtAuth();
         break;
       }
       case NONE:
@@ -42,24 +48,56 @@ public class AuthFactory {
     return authProvider;
   }
 
-  public static List<AuthHandler> authHandlers(AuthProvider authProvider) {
-    List<AuthHandler> list = Lists.newArrayList();
+  /**
+   * 获取jdbc认证
+   *
+   * @return JDBCAuth
+   */
+  public static JDBCAuth jdbcAuth() {
+    return JDBCAuth.create(JustLive.vertx(), DataSourceFactory.sharedJdbcClient());
+  }
+
+  /**
+   * 获取jwt认证
+   *
+   * @return JWTAuth
+   */
+  public static JWTAuth jwtAuth() {
     AuthConf conf = ConfigFactory.load(AuthConf.class);
-    String[] authUsed = conf.getAuthUsed();
-    if (authUsed != null && authUsed.length > 0) {
-      for (String auth : authUsed) {
-        AuthConf.AUTH_TYPE authType = AuthConf.AUTH_TYPE.valueOf(auth);
-        switch (authType) {
-          case BASIC: {
-            list.add(BasicAuthHandler.create(authProvider));
-            break;
-          }
-          default:
-            break;
+    KeyStoreOptions keystoreOptions = new KeyStoreOptions();
+    keystoreOptions.setPassword(conf.getJwtKeystorePassword());
+    keystoreOptions.setPath(conf.getJwtKeystorePath());
+    keystoreOptions.setType(conf.getJwtKeystoreType());
+    JWTAuthOptions config = new JWTAuthOptions().setKeyStore(keystoreOptions);
+    return JWTAuth.create(JustLive.vertx(), config);
+  }
+
+  /**
+   * 获取认证处理
+   *
+   * @param authProvider 认证提供
+   * @return AuthHandler
+   */
+  public static AuthHandler authHandler(AuthProvider authProvider) {
+    AuthConf conf = ConfigFactory.load(AuthConf.class);
+    String authUsed = conf.getAuthUsed();
+    AuthHandler authHandler = null;
+    if (authUsed != null) {
+      AuthConf.AUTH_TYPE authType = AuthConf.AUTH_TYPE.valueOf(authUsed);
+      switch (authType) {
+        case BASIC: {
+          authHandler = BasicAuthHandler.create(authProvider);
+          break;
         }
+        case JWT: {
+          authHandler = JWTAuthHandler.create((JWTAuth) authProvider);
+          break;
+        }
+        default:
+          break;
       }
     }
-    return list;
+    return authHandler;
   }
 
 }

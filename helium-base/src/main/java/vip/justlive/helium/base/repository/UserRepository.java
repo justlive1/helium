@@ -20,7 +20,7 @@ public class UserRepository extends BaseRepository {
    */
   public Promise findUserByUsernameAndPassword(String username, String password) {
     Promise promise = promise();
-    jdbcClient().querySingleWithParams("select * from t_user where username = ? and password = ?",
+    jdbcClient().querySingleWithParams("select * from user where username = ? and password = ?",
       new JsonArray().add(username).add(password), promise);
     return promise;
   }

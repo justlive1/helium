@@ -19,14 +19,22 @@ public class AuthConf {
     /**
      * jdbc认证
      */
-    JDBC
+    JDBC,
+    /**
+     * jwt认证
+     */
+    JWT;
   }
 
   public enum AUTH_TYPE {
     /**
      * Basic Auth
      */
-    BASIC
+    BASIC,
+    /**
+     * jwt Auth
+     */
+    JWT;
   }
 
   /**
@@ -39,12 +47,29 @@ public class AuthConf {
    * 使用认证类型
    */
   @Value("${auth.authUserd:BASIC}")
-  private String[] authUsed;
+  private String authUsed;
 
   /**
    * 需要认证的路径
    */
-  @Value("${auth.authUrlPattern:/**}")
+  @Value("${auth.authUrlPattern:/api/*}")
   private String authUrlPattern;
 
+  /**
+   * jwt认证类型
+   */
+  @Value("${auth.jwt.keystore.type:jceks}")
+  private String jwtKeystoreType;
+
+  /**
+   * jwt认证证书路径
+   */
+  @Value("${auth.jwt.keystore.path}")
+  private String jwtKeystorePath;
+
+  /**
+   * jwt认证密码
+   */
+  @Value("${jwt.auth.keystore.password}")
+  private String jwtKeystorePassword;
 }
