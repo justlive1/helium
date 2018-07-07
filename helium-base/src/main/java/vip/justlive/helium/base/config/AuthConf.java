@@ -70,6 +70,12 @@ public class AuthConf {
   /**
    * jwt认证密码
    */
-  @Value("${jwt.auth.keystore.password}")
+  @Value("${auth.jwt.keystore.password}")
   private String jwtKeystorePassword;
+
+  /**
+   * jwt证书算法
+   */
+  @Value("${auth.jwt.keystore.algorithm:HS512}")
+  private String jwtKeystoreAlgorithm;
 }

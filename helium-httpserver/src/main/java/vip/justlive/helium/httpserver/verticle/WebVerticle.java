@@ -12,14 +12,12 @@ import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
-import io.vertx.ext.web.sstore.ClusteredSessionStore;
-import java.util.List;
+import io.vertx.ext.web.sstore.LocalSessionStore;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import vip.justlive.common.base.constant.BaseConstants;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.support.RouteRegisterFactory;
-import vip.justlive.helium.base.JustLive;
 import vip.justlive.helium.base.config.AuthConf;
 import vip.justlive.helium.base.config.ServerConf;
 import vip.justlive.helium.base.factory.AuthFactory;
@@ -65,7 +63,7 @@ public class WebVerticle extends AbstractVerticle {
     router.route().handler(CookieHandler.create());
     router.route().handler(BodyHandler.create());
     router.route().handler(TimeoutHandler.create());
-    router.route().handler(SessionHandler.create(ClusteredSessionStore.create(vertx)));
+    router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
     router.exceptionHandler(r -> log.error("something is wrong:", r));
   }
 

@@ -1,17 +1,16 @@
 package vip.justlive.helium.httpserver.controller;
 
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jdbc.JDBCAuth;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.web.RoutingContext;
-import vip.justlive.common.base.domain.Response;
+import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.annotation.VertxRequestParam;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
+import vip.justlive.helium.base.config.AuthConf;
 import vip.justlive.helium.base.factory.AuthFactory;
-import vip.justlive.helium.base.factory.RepositoryFactory;
-import vip.justlive.helium.base.repository.BaseRepository.Promise;
-import vip.justlive.helium.base.repository.UserRepository;
 
 /**
  * 访问路由
@@ -23,8 +22,11 @@ public class AccessController {
 
   private final JDBCAuth jdbcAuth;
 
+  private final JWTAuth jwtAuth;
+
   public AccessController() {
     jdbcAuth = AuthFactory.jdbcAuth();
+    jwtAuth = AuthFactory.jwtAuth();
   }
 
   /**
@@ -32,7 +34,6 @@ public class AccessController {
    *
    * @param username 用户名
    * @param password 密码
-   * @return json
    */
   @VertxRouteMapping(value = "/jwt")
   public void jwt(@VertxRequestParam(value = "username", required = false) String username,
@@ -40,7 +41,10 @@ public class AccessController {
     jdbcAuth
       .authenticate(new JsonObject().put("username", username).put("password", password), r -> {
         if (r.succeeded()) {
-          ctx.response().end("success");
+          AuthConf authConf = ConfigFactory.load(AuthConf.class);
+          ctx.response().end(
+            jwtAuth.generateToken(r.result().principal(),
+              new JWTOptions().setAlgorithm(authConf.getJwtKeystoreAlgorithm())));
         } else {
           ctx.fail(401);
         }
