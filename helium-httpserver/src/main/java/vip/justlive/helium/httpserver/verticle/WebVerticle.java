@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.AuthHandler;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -12,6 +13,9 @@ import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
+import io.vertx.ext.web.handler.sockjs.BridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +46,7 @@ public class WebVerticle extends AbstractVerticle {
     baseRoute(router);
     authRoute(router);
     serviceRoute(router);
+    websocketRoute(router);
 
     ServerConf conf = ConfigFactory.load(ServerConf.class);
     vertx.createHttpServer().requestHandler(router::accept).listen(conf.getPort());
@@ -94,4 +99,25 @@ public class WebVerticle extends AbstractVerticle {
     RouteRegisterFactory routeRegisterFactory = new RouteRegisterFactory(router);
     routeRegisterFactory.execute("vip.justlive.helium");
   }
+
+  private void websocketRoute(Router router) {
+    ServerConf conf = ConfigFactory.load(ServerConf.class);
+    SockJSHandlerOptions sockjsopt = new SockJSHandlerOptions()
+      .setHeartbeatInterval(conf.getSockjsHeartbeatInterval());
+
+    SockJSHandler sockJSHandler = SockJSHandler.create(vertx, sockjsopt);
+    BridgeOptions opt = new BridgeOptions();
+    opt.setPingTimeout(conf.getSockjsPingTimeout());
+    opt.addInboundPermitted(
+      new PermittedOptions().setRequiredAuthority(conf.getSockjsRequiredAuthority()));
+
+    sockJSHandler.bridge(opt, be -> {
+      System.out.println(be);
+      be.complete();
+    });
+
+    AuthConf authConf = ConfigFactory.load(AuthConf.class);
+    router.route(authConf.getAuthUrlPattern()).handler(sockJSHandler);
+  }
+
 }
