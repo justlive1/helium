@@ -9,7 +9,7 @@ import io.vertx.ext.web.handler.AuthHandler;
 import io.vertx.ext.web.handler.BasicAuthHandler;
 import io.vertx.ext.web.handler.JWTAuthHandler;
 import vip.justlive.common.base.support.ConfigFactory;
-import vip.justlive.helium.base.JustLive;
+import vip.justlive.common.web.vertx.JustLive;
 import vip.justlive.helium.base.config.AuthConf;
 
 /**

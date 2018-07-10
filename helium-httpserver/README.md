@@ -16,8 +16,8 @@ http服务
 
 idea/eclipse 运行
 - 增加Application类型的启动配置
-- Main class：vip.justlive.helium.base.JustLive
-- Program args: run vip.justlive.helium.httpserver.verticle.WebVerticle
+- Main class：vip.justlive.common.web.vertx.JustLive
+- Program args: run vip.justlive.helium.httpserver.verticle.MainVerticle
 
 
 build

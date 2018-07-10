@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import java.util.Map;
 import vip.justlive.common.base.support.ConfigFactory;
-import vip.justlive.helium.base.JustLive;
+import vip.justlive.common.web.vertx.JustLive;
 import vip.justlive.helium.base.config.DataSourceConf;
 
 /**
