@@ -47,7 +47,7 @@ public class DataSourceFactory {
    * @return jdbcClient
    */
   public static JDBCClient sharedSingleJdbcClient(Class<?> clazz) {
-    JDBCClient client = CLIENTS.get(DataSourceFactory.class);
+    JDBCClient client = CLIENTS.get(clazz);
     if (client == null) {
       CLIENTS.putIfAbsent(clazz, sharedJdbcClient());
     }

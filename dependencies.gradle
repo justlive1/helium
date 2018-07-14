@@ -15,6 +15,9 @@ ext.libraries = [
     },
     dependencies.create("io.vertx:vertx-auth-jwt:$vertxVersion") {
       force = true
+    },
+    dependencies.create("io.vertx:vertx-hazelcast:$vertxVersion") {
+      force = true
     }
   ],
 

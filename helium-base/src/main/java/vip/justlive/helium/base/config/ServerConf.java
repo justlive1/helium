@@ -38,12 +38,12 @@ public class ServerConf {
   /**
    * Bridge 进入边界通配
    */
-  @Value("${server.sockjs.inboundPermittedPattern:im\\..+}")
+  @Value("${server.sockjs.inboundPermittedPattern:im\\..*}")
   private String sockjsInboundPermittedPattern;
 
   /**
    * Bridge 出去边界通配
    */
-  @Value("${server.sockjs.outboundPermittedPattern:im\\..+}")
+  @Value("${server.sockjs.outboundPermittedPattern:im\\..*}")
   private String sockjsOutboundPermittedPattern;
 }

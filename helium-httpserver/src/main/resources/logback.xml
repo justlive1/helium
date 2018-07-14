@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="false">
+<configuration debug="false" scan="true" scanPeriod="1 seconds">
 
+  <contextName>logback</contextName>
+  <property name="log.path" value="logs"/>
   <property name="pattern"
     value="%d{yyyy-MM-dd HH:mm:ss.SSS,GMT+8} %X{RequestNo} [%thread] %-5level %logger{128} %method[%L] %msg%n"/>
 
@@ -25,8 +27,11 @@
     </encoder>
   </appender>
 
+  <logger name="io.netty" level="warn"/>
+  <logger name="io.vertx" level="info"/>
+  <logger name="com.zaxxer.hikari" level="warn"/>
 
-  <root level="DEBUG">
+  <root level="debug">
     <appender-ref ref="STDOUT"/>
     <appender-ref ref="FILE"/>
   </root>

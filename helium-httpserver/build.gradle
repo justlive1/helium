@@ -2,6 +2,7 @@ dependencies {
 
   compile project(':helium-base')
 
+  compile "io.vertx:vertx-auth-shiro:$vertxVersion"
 
 }
 

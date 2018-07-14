@@ -1,13 +1,24 @@
 package vip.justlive.helium.httpserver.verticle;
 
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.bridge.BridgeEventType;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.AuthHandler;
+import io.vertx.ext.web.handler.JWTAuthHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
+import io.vertx.ext.web.handler.sockjs.BridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSSocket;
 import lombok.extern.slf4j.Slf4j;
 import vip.justlive.common.base.support.ConfigFactory;
-import vip.justlive.common.web.vertx.BaseWebVerticle;
 import vip.justlive.common.web.vertx.annotation.VertxVerticle;
+import vip.justlive.common.web.vertx.core.BaseWebVerticle;
+import vip.justlive.common.web.vertx.core.JWTLoginHandlerImpl;
+import vip.justlive.common.web.vertx.core.TokenJWTAuthHandlerImpl;
 import vip.justlive.common.web.vertx.support.RouteRegisterFactory;
 import vip.justlive.helium.base.config.AuthConf;
 import vip.justlive.helium.base.config.ServerConf;
@@ -27,42 +38,59 @@ public class WebVerticle extends BaseWebVerticle {
 
     Router router = Router.router(vertx);
 
-    baseRoute(router);
-    authRoute(router);
-    serviceRoute(router);
+    baseRoute("(https|http)://.*", router);
+
+    AuthConf authConf = ConfigFactory.load(AuthConf.class);
+    AuthProvider jdbcAuth = AuthFactory.jdbcAuth();
+    JWTAuth jwtAuth = AuthFactory.jwtAuth();
+    router.route().handler(UserSessionHandler.create(AuthFactory.jwtAuth()));
+    router.route("/login").handler(new JWTLoginHandlerImpl(jwtAuth, jdbcAuth,
+      JWTLoginHandlerImpl.DEFAULT_U_PARAM, JWTLoginHandlerImpl.DEFAULT_P_PARAM, true)
+      .setAlgorithm(authConf.getJwtKeystoreAlgorithm()));
+
+    router.route().handler(new TokenJWTAuthHandlerImpl(jwtAuth, null));
+
+    serviceRoute(router, "vip.justlive.helium");
+    websocketRoute(router);
 
     ServerConf conf = ConfigFactory.load(ServerConf.class);
     vertx.createHttpServer().requestHandler(router::accept).listen(conf.getPort());
 
   }
 
+  private void websocketRoute(Router router) {
+    ServerConf conf = ConfigFactory.load(ServerConf.class);
+    SockJSHandlerOptions sockjsopt = new SockJSHandlerOptions()
+      .setHeartbeatInterval(conf.getSockjsHeartbeatInterval());
 
-  /**
-   * 安全认证路由
-   *
-   * @param router router
-   */
-  private void authRoute(Router router) {
+    SockJSHandler sockJSHandler = SockJSHandler.create(vertx, sockjsopt);
 
-    AuthProvider authProvider = AuthFactory.authProvider();
+    BridgeOptions options = new BridgeOptions()
+      .addInboundPermitted(new PermittedOptions()
+        .setAddressRegex(conf.getSockjsInboundPermittedPattern()))
+      .addOutboundPermitted(new PermittedOptions()
+        .setAddressRegex(conf.getSockjsOutboundPermittedPattern()));
 
-    if (authProvider != null) {
-      router.route().handler(UserSessionHandler.create(authProvider));
-      AuthHandler authHandler = AuthFactory.authHandler(authProvider);
-      AuthConf authConf = ConfigFactory.load(AuthConf.class);
-      router.route(authConf.getAuthUrlPattern()).handler(authHandler);
-    }
+    sockJSHandler.bridge(options, be -> {
+      if (be.type() != BridgeEventType.SOCKET_PING && log.isDebugEnabled()) {
+        log.debug("receive msg: [{}]", be.getRawMessage());
+      }
+
+      if (be.type() == BridgeEventType.SOCKET_CREATED) {
+        SockJSSocket socket = be.socket();
+//        vertx.eventBus().consumer(socket.writeHandlerID());
+      }
+
+      be.complete(true);
+    });
+
+    AuthConf authConf = ConfigFactory.load(AuthConf.class);
+    router.route(authConf.getAuthUrlPattern()).handler(ctx -> {
+      log.info("sockjs user -> {}", ctx.user());
+      ctx.next();
+    });
+    router.route(authConf.getAuthUrlPattern()).handler(sockJSHandler);
+
+    router.route().handler(StaticHandler.create());
   }
-
-  /**
-   * 业务路由
-   *
-   * @param router route
-   */
-  private void serviceRoute(Router router) {
-
-    RouteRegisterFactory routeRegisterFactory = new RouteRegisterFactory(router);
-    routeRegisterFactory.execute("vip.justlive.helium");
-  }
-
 }
