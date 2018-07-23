@@ -6,6 +6,7 @@ import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.JustLive;
+import vip.justlive.common.web.vertx.datasource.DataSourceFactory;
 import vip.justlive.helium.base.config.AuthConf;
 
 /**

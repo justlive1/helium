@@ -5,8 +5,6 @@ import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.AuthHandler;
-import io.vertx.ext.web.handler.JWTAuthHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
@@ -19,7 +17,6 @@ import vip.justlive.common.web.vertx.annotation.VertxVerticle;
 import vip.justlive.common.web.vertx.core.BaseWebVerticle;
 import vip.justlive.common.web.vertx.core.JWTLoginHandlerImpl;
 import vip.justlive.common.web.vertx.core.TokenJWTAuthHandlerImpl;
-import vip.justlive.common.web.vertx.support.RouteRegisterFactory;
 import vip.justlive.helium.base.config.AuthConf;
 import vip.justlive.helium.base.config.ServerConf;
 import vip.justlive.helium.base.factory.AuthFactory;
@@ -48,7 +45,7 @@ public class WebVerticle extends BaseWebVerticle {
       JWTLoginHandlerImpl.DEFAULT_U_PARAM, JWTLoginHandlerImpl.DEFAULT_P_PARAM, true)
       .setAlgorithm(authConf.getJwtKeystoreAlgorithm()));
 
-    router.route().handler(new TokenJWTAuthHandlerImpl(jwtAuth, null));
+    router.route(authConf.getAuthUrlPattern()).handler(new TokenJWTAuthHandlerImpl(jwtAuth, null));
 
     serviceRoute(router, "vip.justlive.helium");
     websocketRoute(router);
