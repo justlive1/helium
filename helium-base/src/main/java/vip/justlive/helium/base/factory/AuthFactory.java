@@ -1,11 +1,11 @@
 package vip.justlive.helium.base.factory;
 
 import io.vertx.ext.auth.KeyStoreOptions;
-import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.JustLive;
+import vip.justlive.common.web.vertx.auth.JdbcAuth;
 import vip.justlive.common.web.vertx.datasource.DataSourceFactory;
 import vip.justlive.helium.base.config.AuthConf;
 
@@ -24,8 +24,8 @@ public class AuthFactory {
    *
    * @return JDBCAuth
    */
-  public static JDBCAuth jdbcAuth() {
-    return JDBCAuth.create(JustLive.vertx(), DataSourceFactory.sharedJdbcClient());
+  public static JdbcAuth jdbcAuth() {
+    return new JdbcAuth(DataSourceFactory.sharedJdbcClient());
   }
 
   /**
