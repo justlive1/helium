@@ -13,8 +13,15 @@
  */
 package vip.justlive.helium.base.entity;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.AbstractUser;
+import io.vertx.ext.auth.AuthProvider;
 import java.io.Serializable;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import vip.justlive.common.base.annotation.Column;
 import vip.justlive.common.base.annotation.Id;
 import vip.justlive.common.base.annotation.Table;
@@ -25,8 +32,9 @@ import vip.justlive.common.base.annotation.Table;
  * @author wubo
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table
-public class User implements Serializable {
+public class User extends AbstractUser implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,7 +48,38 @@ public class User implements Serializable {
   @Column
   private String password;
 
-  @Column(name = "password_salt")
-  private String passwordSalt;
+  /**
+   * 昵称
+   */
+  @Column
+  private String nickname;
 
+  /**
+   * 签名
+   */
+  @Column
+  private String signature;
+
+  @Column(name = "create_at")
+  private String createAt;
+
+  private transient JsonObject principal;
+
+  @Override
+  protected void doIsPermitted(String permission, Handler<AsyncResult<Boolean>> resultHandler) {
+    resultHandler.handle(Future.succeededFuture(true));
+  }
+
+  @Override
+  public JsonObject principal() {
+    if (principal == null) {
+      principal = new JsonObject().put("username", username);
+    }
+    return principal;
+  }
+
+  @Override
+  public void setAuthProvider(AuthProvider authProvider) {
+    // nothing to do
+  }
 }

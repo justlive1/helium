@@ -1,6 +1,7 @@
 dependencies {
 
     compile libraries.earthcommon
+    compile libraries.commons
     compile libraries.logging
     compile libraries.vertx
     compile libraries.sqlite

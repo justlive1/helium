@@ -16,6 +16,9 @@ ext.libraries = [
     dependencies.create("io.vertx:vertx-auth-jwt:$vertxVersion") {
       force = true
     },
+    dependencies.create("io.vertx:vertx-web-templ-thymeleaf:$vertxVersion") {
+      force = true
+    },
     dependencies.create("io.vertx:vertx-hazelcast:$vertxVersion") {
       force = true
     }
@@ -26,6 +29,9 @@ ext.libraries = [
       force = true
     },
     dependencies.create("org.projectlombok:lombok:$lombokVersion") {
+      force = true
+    },
+    dependencies.create("com.github.penggle:kaptcha:$googleKaptcha") {
       force = true
     }
   ],

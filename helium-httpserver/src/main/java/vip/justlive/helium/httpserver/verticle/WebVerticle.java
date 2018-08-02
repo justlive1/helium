@@ -13,20 +13,23 @@
  */
 package vip.justlive.helium.httpserver.verticle;
 
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.TemplateHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
+import io.vertx.ext.web.templ.TemplateEngine;
+import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
+import io.vertx.ext.web.templ.impl.CachingTemplateEngine;
 import lombok.extern.slf4j.Slf4j;
+import org.thymeleaf.templatemode.TemplateMode;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.annotation.VertxVerticle;
-import vip.justlive.common.web.vertx.auth.JWTLoginHandlerImpl;
 import vip.justlive.common.web.vertx.auth.TokenJWTAuthHandlerImpl;
 import vip.justlive.common.web.vertx.core.BaseWebVerticle;
 import vip.justlive.helium.base.config.AuthConf;
@@ -50,17 +53,14 @@ public class WebVerticle extends BaseWebVerticle {
     baseRoute("(https|http)://.*", router);
 
     AuthConf authConf = ConfigFactory.load(AuthConf.class);
-    AuthProvider jdbcAuth = AuthFactory.jdbcAuth();
     JWTAuth jwtAuth = AuthFactory.jwtAuth();
     router.route().handler(UserSessionHandler.create(jwtAuth));
-    router.route("/login").handler(new JWTLoginHandlerImpl(jwtAuth, jdbcAuth,
-      JWTLoginHandlerImpl.DEFAULT_U_PARAM, JWTLoginHandlerImpl.DEFAULT_P_PARAM, true)
-      .setAlgorithm(authConf.getJwtKeystoreAlgorithm()));
 
     router.route(authConf.getAuthUrlPattern()).handler(new TokenJWTAuthHandlerImpl(jwtAuth, null));
 
     serviceRoute(router, "vip.justlive.helium");
     websocketRoute(router);
+    staticResourceRoute(router);
 
     ServerConf conf = ConfigFactory.load(ServerConf.class);
     vertx.createHttpServer().requestHandler(router::accept).listen(conf.getPort());
@@ -95,7 +95,17 @@ public class WebVerticle extends BaseWebVerticle {
       ctx.next();
     });
     router.route(authConf.getAuthUrlPattern()).handler(sockJSHandler);
+  }
 
-    router.route().handler(StaticHandler.create());
+  private void staticResourceRoute(Router router) {
+    System
+      .setProperty(CachingTemplateEngine.DISABLE_TEMPL_CACHING_PROP_NAME, Boolean.TRUE.toString());
+
+    router.route("/static/*").handler(StaticHandler.create());
+
+    TemplateEngine engine = ThymeleafTemplateEngine.create().setMode(TemplateMode.HTML);
+    TemplateHandler handler = TemplateHandler.create(engine);
+    router.route().handler(handler);
+
   }
 }
