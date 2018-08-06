@@ -1,3 +1,16 @@
+/*
+ *  Copyright (C) 2018 justlive1
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 window.Win10 = {
   _version: 'v1.1.2.4',
   _debug: true,
@@ -35,7 +48,7 @@ window.Win10 = {
         for (var i in this.iframes) {
           var eid = undefined;
           if ((eid = this.iframes[i].element.id) && !document.getElementById(
-              eid)) {
+            eid)) {
             delete this.iframes[i];
             continue;
           }
@@ -79,7 +92,7 @@ window.Win10 = {
         loaders.each(function () {
           var loader = layui.$(this);
           if (loader.attr('src') === Win10._bgs.mobile && loader.hasClass(
-              'loaded')) {
+            'loaded')) {
             Win10._setBackgroundImg(Win10._bgs.mobile);
             flag = true;
           }
@@ -100,7 +113,7 @@ window.Win10 = {
         loaders.each(function () {
           var loader = layui.$(this);
           if (loader.attr('src') === Win10._bgs.main && loader.hasClass(
-              'loaded')) {
+            'loaded')) {
             Win10._setBackgroundImg(Win10._bgs.main);
             flag = true;
           }
@@ -124,7 +137,7 @@ window.Win10 = {
       var classes_lenth = Win10._animated_classes.length;
       var animated_liveness = Win10._animated_liveness;
       if (animated_liveness === 0 || classes_lenth === 0 || !layui.$(
-          "#win10-menu").hasClass('opened')) {
+        "#win10-menu").hasClass('opened')) {
         return;
       }
       layui.$('#win10-menu>.blocks>.menu_group>.block').each(function () {
@@ -283,7 +296,7 @@ window.Win10 = {
             + bg + '"></i>' + title;
         }
         if (!title && $this.children('.icon').length === 1 && $this.children(
-            '.title').length === 1) {
+          '.title').length === 1) {
           title = $this.children('.icon').prop("outerHTML") + $this.children(
             '.title').html();
         }

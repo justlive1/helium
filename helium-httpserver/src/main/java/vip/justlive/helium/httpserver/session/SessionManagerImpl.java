@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -32,7 +32,7 @@ public class SessionManagerImpl implements SessionManager {
   @Override
   public Session create(User user, String token) {
     Session session = new EventBusSession();
-    session.setId(user.getUsername());
+    session.setId(user.getId().toString());
     session.setUsername(user.getUsername());
     session.setUserId(user.getId());
     session.setToken(token);

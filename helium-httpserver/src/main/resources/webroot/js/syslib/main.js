@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  */
 layui.use(['jquery', 'layer', 'layim'], function () {
   Win10.onReady(function () {
-    Win10.setAnimated(['animated flip', 'animated bounceIn',], 0.01);
+    Win10.setAnimated(['animated flip', 'animated bounceIn'], 0.01);
     var bgUrl = {
       main: '/static/image/main.jpg',
       mobile: '/static/image/mobile.jpg'
@@ -28,7 +28,7 @@ layui.use(['jquery', 'layer', 'layim'], function () {
 
     setTimeout(function () {
       Win10.newMsg('官方QQ', '1106088328')
-    }, 2500)
+    }, 2500);
 
     setTimeout(function () {
       Win10.newMsg('分布式任务调度', '登录用户名: frost, 登录密码: frost');
@@ -38,15 +38,30 @@ layui.use(['jquery', 'layer', 'layim'], function () {
 
   window.openIm = function () {
     var token = sessionStorage.getItem("token");
-    if (token) {
-      // TODO
-      return;
+    var uid = sessionStorage.getItem("uid");
+    if (token && uid) {
+      if (window.Him) {
+        initHim(token, uid);
+      } else {
+        window.initIM();
+      }
     } else {
-      Win10.openUrl('/login.html', 'IM', [['500px', '420px'], 'auto'], '0001');
+      openLoginPage();
     }
   };
 
-  window.initIM = function () {
+  function openLoginPage() {
+    sessionStorage.clear();
+    Win10.openUrl('/login.html', 'IM', [['500px', '420px'], 'auto'], '0001');
+  }
+
+  function initHim(token, uid) {
+    var him = new window.Him(token, uid);
+    him.init();
+    window.him = him;
+  }
+
+  function initHimUi() {
     layui.$.ajax({
       url: "/interface/friend/mine",
       type: 'post',
@@ -78,6 +93,24 @@ layui.use(['jquery', 'layer', 'layim'], function () {
       },
       error: function () {
         layui.layer.alert("服务器繁忙，请稍后重试！");
+      }
+    });
+  }
+
+  window.initIM = function () {
+    layui.$.ajax({
+      url: "/interface/him.js",
+      dataType: "script",
+      success: function () {
+        initHim(sessionStorage.getItem("token"), sessionStorage.getItem("uid"));
+        initHimUi();
+      },
+      error: function (rsp) {
+        if (rsp.status === 401) {
+          openLoginPage();
+        } else {
+          layui.layer.alert("服务器繁忙，请稍后重试！");
+        }
       }
     });
   };

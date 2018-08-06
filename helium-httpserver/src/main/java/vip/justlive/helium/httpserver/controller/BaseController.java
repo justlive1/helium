@@ -11,19 +11,23 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-dependencies {
+package vip.justlive.helium.httpserver.controller;
 
-  compile project(':helium-base')
+import io.vertx.ext.web.RoutingContext;
+import vip.justlive.helium.base.entity.User;
 
-}
+/**
+ * base controller
+ *
+ * @author wubo
+ */
+public class BaseController {
 
-jar {
-  manifest {
-    attributes "Main-Class": "vip.justlive.helium.base.JustLive"
-    attributes "Main-Verticle": "vip.justlive.helium.base.MainVerticle"
+  protected User user(RoutingContext ctx) {
+    return (User) ctx.user();
   }
 
-  from {
-    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  protected String sessionId(RoutingContext ctx) {
+    return user(ctx).getId().toString();
   }
 }

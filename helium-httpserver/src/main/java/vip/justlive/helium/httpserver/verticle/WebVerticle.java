@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -16,7 +16,6 @@ package vip.justlive.helium.httpserver.verticle;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.RedirectAuthHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
@@ -30,6 +29,7 @@ import vip.justlive.common.web.vertx.core.BaseWebVerticle;
 import vip.justlive.helium.base.config.AuthConf;
 import vip.justlive.helium.base.config.ServerConf;
 import vip.justlive.helium.base.factory.AuthFactory;
+import vip.justlive.helium.httpserver.service.SockjsService;
 
 /**
  * web单元
@@ -52,8 +52,6 @@ public class WebVerticle extends BaseWebVerticle {
     router.route("/").handler(ctx -> ctx.reroute("/index.html"));
     router.route("/static/*").handler(StaticHandler.create());
     router.route().handler(UserSessionHandler.create(jwtAuth));
-    router.route(authConf.getAuthUrlPattern())
-      .handler(RedirectAuthHandler.create(jwtAuth, authConf.getLoginPageUrl()));
     router.route(authConf.getAuthUrlPattern()).handler(new TokenJWTAuthHandlerImpl(jwtAuth, null));
     serviceRoute(router, "vip.justlive.helium");
     websocketRoute(router);
@@ -70,7 +68,8 @@ public class WebVerticle extends BaseWebVerticle {
       new BridgeOptions().addInboundPermitted(
         new PermittedOptions().setAddressRegex(conf.getSockjsInboundPermittedPattern()))
         .addOutboundPermitted(
-          new PermittedOptions().setAddressRegex(conf.getSockjsOutboundPermittedPattern()))));
+          new PermittedOptions().setAddressRegex(conf.getSockjsOutboundPermittedPattern())),
+      new SockjsService()));
   }
 
 }

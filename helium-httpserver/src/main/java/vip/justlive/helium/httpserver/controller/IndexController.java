@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -15,6 +15,8 @@ package vip.justlive.helium.httpserver.controller;
 
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
+import io.vertx.ext.web.templ.impl.CachingTemplateEngine;
+import org.thymeleaf.templatemode.TemplateMode;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
@@ -29,11 +31,15 @@ import vip.justlive.helium.base.tmpl.DelegateTemplateEngine;
 @VertxRoute
 public class IndexController {
 
-  private final DelegateTemplateEngine engine;
+  private final DelegateTemplateEngine htmlEngine;
+  private final DelegateTemplateEngine jsEngine;
 
   public IndexController() {
-    this.engine = DelegateTemplateEngine
-      .create(ThymeleafTemplateEngine.create());
+    System
+      .setProperty(CachingTemplateEngine.DISABLE_TEMPL_CACHING_PROP_NAME, Boolean.TRUE.toString());
+    this.htmlEngine = DelegateTemplateEngine.create(ThymeleafTemplateEngine.create());
+    this.jsEngine = DelegateTemplateEngine.create(ThymeleafTemplateEngine.create().setMode(
+      TemplateMode.JAVASCRIPT));
   }
 
   /**
@@ -43,7 +49,7 @@ public class IndexController {
    */
   @VertxRouteMapping("/login.html")
   public void login(RoutingContext ctx) {
-    engine.render(ctx, "/login.html");
+    htmlEngine.render(ctx, "/login.html");
   }
 
   /**
@@ -53,7 +59,7 @@ public class IndexController {
    */
   @VertxRouteMapping("/register.html")
   public void register(RoutingContext ctx) {
-    engine.render(ctx, "/register.html");
+    htmlEngine.render(ctx, "/register.html");
   }
 
   /**
@@ -65,6 +71,19 @@ public class IndexController {
   public void index(RoutingContext ctx) {
     WebImConf conf = ConfigFactory.load(WebImConf.class);
     ctx.put("webImConf", conf);
-    engine.render(ctx, "/index.html");
+    htmlEngine.render(ctx, "/index.html");
   }
+
+  /**
+   * him.js
+   *
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/interface/him.js")
+  public void himJs(RoutingContext ctx) {
+    WebImConf conf = ConfigFactory.load(WebImConf.class);
+    ctx.put("webImConf", conf);
+    jsEngine.render(ctx, "/him.js");
+  }
+
 }

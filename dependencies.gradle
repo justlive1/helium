@@ -1,28 +1,17 @@
+/*
+ *  Copyright (C) 2018 justlive1
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 ext.libraries = [
-
-  vertx      : [
-    dependencies.create("io.vertx:vertx-core:$vertxVersion") {
-      force = true
-    },
-    dependencies.create("io.vertx:vertx-unit:$vertxVersion") {
-      force = true
-    },
-    dependencies.create("io.vertx:vertx-jdbc-client:$vertxVersion") {
-      force = true
-    },
-    dependencies.create("io.vertx:vertx-auth-jdbc:$vertxVersion") {
-      force = true
-    },
-    dependencies.create("io.vertx:vertx-auth-jwt:$vertxVersion") {
-      force = true
-    },
-    dependencies.create("io.vertx:vertx-web-templ-thymeleaf:$vertxVersion") {
-      force = true
-    },
-    dependencies.create("io.vertx:vertx-hazelcast:$vertxVersion") {
-      force = true
-    }
-  ],
 
   commons    : [
     dependencies.create("com.google.guava:guava:$guavaVersion") {
@@ -36,6 +25,16 @@ ext.libraries = [
     }
   ],
 
+  earthcommon: [
+    dependencies.create("vip.justlive:snow-common-web-vertx:$snowVersion") {
+      force = true
+    }
+  ],
+
+  mysql      : [
+    dependencies.create("mysql:mysql-connector-java:$mysqlVersion")
+  ],
+
   logging    : [
     dependencies.create("org.slf4j:slf4j-api:$log4jVersion") {
       force = true
@@ -45,10 +44,8 @@ ext.libraries = [
     }
   ],
 
-  earthcommon: [
-    dependencies.create("vip.justlive:snow-common-web-vertx:$snowVersion") {
-      force = true
-    }
+  sqlite     : [
+    dependencies.create("org.xerial:sqlite-jdbc:$sqliteVersion")
   ],
 
   test       : [
@@ -57,12 +54,16 @@ ext.libraries = [
     }
   ],
 
-  sqlite     : [
-    dependencies.create("org.xerial:sqlite-jdbc:$sqliteVersion")
-  ],
-
-  mysql      : [
-    dependencies.create("mysql:mysql-connector-java:$mysqlVersion")
+  vertx      : [
+    dependencies.create("io.vertx:vertx-core:$vertxVersion") {
+      force = true
+    },
+    dependencies.create("io.vertx:vertx-web-templ-thymeleaf:$vertxVersion") {
+      force = true
+    },
+    dependencies.create("io.vertx:vertx-hazelcast:$vertxVersion") {
+      force = true
+    }
   ]
 ]
 

@@ -1,8 +1,7 @@
-<!DOCTYPE html>
 <!--
-  ~ Copyright (C) 2018 justlive1
+  ~  Copyright (C) 2018 justlive1
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+  ~  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
   ~ in compliance with the License. You may obtain a copy of the License at
   ~
   ~ http://www.apache.org/licenses/LICENSE-2.0
@@ -12,6 +11,7 @@
   ~ or implied. See the License for the specific language governing permissions and limitations under
   ~ the License.
   -->
+<!DOCTYPE html>
 <html lang="zh-cn">
 <head>
   <meta charset="UTF-8">
@@ -53,7 +53,8 @@
         data: JSON.stringify(data.field),
         success: function (resp) {
           if (resp.success) {
-            sessionStorage.setItem("token", resp.data);
+            sessionStorage.setItem("token", resp.data.token);
+            sessionStorage.setItem("uid", resp.data.uid);
             parent.window.initIM();
             Win10_child.close();
           } else {

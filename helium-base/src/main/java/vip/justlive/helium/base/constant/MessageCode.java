@@ -11,19 +11,23 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-dependencies {
+package vip.justlive.helium.base.constant;
 
-  compile project(':helium-base')
+/**
+ * 消息code枚举
+ *
+ * @author wubo
+ */
+public enum MessageCode {
 
-}
+  /**
+   * ping
+   */
+  M_200,
 
-jar {
-  manifest {
-    attributes "Main-Class": "vip.justlive.helium.base.JustLive"
-    attributes "Main-Verticle": "vip.justlive.helium.base.MainVerticle"
-  }
+  /**
+   * 好友聊天
+   */
+  M_300;
 
-  from {
-    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-  }
 }

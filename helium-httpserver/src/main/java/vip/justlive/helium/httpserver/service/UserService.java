@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -13,6 +13,8 @@
  */
 package vip.justlive.helium.httpserver.service;
 
+import com.google.common.collect.ImmutableMap;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.web.RoutingContext;
@@ -105,9 +107,11 @@ public class UserService extends BaseService {
             && authConf.getJwtKeystoreAlgorithm().length() > 0) {
             jwtOptions.setAlgorithm(authConf.getJwtKeystoreAlgorithm());
           }
-          String token = jwtAuth.generateToken(ctx.user().principal(), jwtOptions);
+          String token = jwtAuth.generateToken(
+            new JsonObject().put("username", user.getUsername()).put("uid", user.getId()),
+            jwtOptions);
           sessionManager.create(user, token);
-          success(token, ctx);
+          success(ImmutableMap.of("token", token, "uid", user.getId()), ctx);
         } else {
           ctx.fail(403);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -26,7 +26,7 @@ import vip.justlive.helium.httpserver.service.FriendService;
  * @author wubo
  */
 @VertxRoute("/interface/friend")
-public class FriendController {
+public class FriendController extends BaseController {
 
   private final FriendService friendService;
 
@@ -41,7 +41,7 @@ public class FriendController {
    */
   @VertxRouteMapping("/mine")
   public void mine(RoutingContext ctx) {
-    friendService.mine(username(ctx), ctx);
+    friendService.mine(sessionId(ctx), ctx);
   }
 
   /**
@@ -55,11 +55,8 @@ public class FriendController {
     if (friend.getFriendGroupId() == null || friend.getFriendUserId() == null) {
       ctx.fail(400);
     } else {
-      friendService.addFriend(friend, username(ctx), ctx);
+      friendService.addFriend(friend, sessionId(ctx), ctx);
     }
   }
 
-  private String username(RoutingContext ctx) {
-    return ctx.user().principal().getString("username");
-  }
 }
