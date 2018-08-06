@@ -31,7 +31,7 @@ create table friend_group
   id integer not null primary key autoincrement,
   user_id integer comment '所属用户id' not null,
   name varchar comment '分组名称' not null,
-  order_index integer comment '分组排序' default 0
+  order_index integer comment '分组排序' default 1
 )
 ;
 

@@ -18,17 +18,17 @@
   <title>注册</title>
   <meta name="viewport"
         content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <link rel='Shortcut Icon' type='image/x-icon' href="/static/image/window.ico">
   <link href="static/css/default.css" rel="stylesheet">
 </head>
 <body>
 <div id="win10-login">
-  <div style="height: 10%; min-height: 120px"></div>
+  <div style="min-height: 20px"></div>
   <div id="win10-login-box">
     <div class="win10-login-box-square">
       <img src="static/image/avatar.jpg" class="content"/>
     </div>
-    <p style="font-size: 24px; color: white; text-align: center">
-      REGISTER</p>
+    <p style="font-size: 24px; color: white; text-align: center">REGISTER</p>
     <form class="layui-form" action="/register" method="post">
       <input type="text" placeholder="请输入账号" lay-verify="required" class="login-username"
              name="username"/>
@@ -43,7 +43,7 @@
   </div>
 </div>
 
-<script type="text/javascript" src="static/js/layui-v2.3.0/layui.all.js"></script>
+<script type="text/javascript" src="static/js/layui-v2.3.0/layui.js"></script>
 <script type="text/javascript">
   layui.use(['form', 'layer'], function () {
     layui.form.on('submit(register)', function (data) {

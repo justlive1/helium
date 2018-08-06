@@ -17,46 +17,29 @@ import lombok.Data;
 import vip.justlive.common.base.annotation.Value;
 
 /**
- * 认证配置
+ * web版IM配置
  *
  * @author wubo
  */
 @Data
-public class AuthConf {
+public class WebImConf {
 
   /**
-   * 需要认证的路径
+   * web版im地址
    */
-  @Value("${auth.authUrlPattern:/interface/*}")
-  private String authUrlPattern;
+  @Value("${web.im.url}")
+  private String webImUrl;
 
   /**
-   * jwt认证类型
+   * 备案号
    */
-  @Value("${auth.jwt.keystore.type:jceks}")
-  private String jwtKeystoreType;
+  @Value("${web.icp}")
+  private String icp;
 
-  /**
-   * jwt认证证书路径
-   */
-  @Value("${auth.jwt.keystore.path}")
-  private String jwtKeystorePath;
+  @Value("${web.beianInfo}")
+  private String beianInfo;
 
-  /**
-   * jwt认证密码
-   */
-  @Value("${auth.jwt.keystore.password}")
-  private String jwtKeystorePassword;
+  @Value("${web.beianUrl}")
+  private String beianUrl;
 
-  /**
-   * jwt证书算法
-   */
-  @Value("${auth.jwt.keystore.algorithm:HS512}")
-  private String jwtKeystoreAlgorithm;
-
-  /**
-   * 登录页面
-   */
-  @Value("${auth.login.url:/login.html}")
-  private String loginPageUrl;
 }

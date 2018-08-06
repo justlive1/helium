@@ -35,6 +35,16 @@ public class FriendController {
   }
 
   /**
+   * 我的*
+   *
+   * @param ctx
+   */
+  @VertxRouteMapping("/mine")
+  public void mine(RoutingContext ctx) {
+    friendService.mine(username(ctx), ctx);
+  }
+
+  /**
    * 添加好友
    *
    * @param friend 好友信息

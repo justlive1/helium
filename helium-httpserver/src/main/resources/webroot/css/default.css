@@ -11,10 +11,15 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+@charset "utf-8";
 
 * {
   font-family: "Microsoft YaHei", 微软雅黑, MicrosoftJhengHei, 华文细黑, STHeiti,
   MingLiu
+}
+
+.layui-layim, layui-layim-min {
+  padding-bottom: 40px !important;
 }
 
 /*磁贴自定义样式*/
