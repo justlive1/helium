@@ -60,6 +60,12 @@ public class User extends AbstractUser implements Serializable {
   @Column
   private String signature;
 
+  /**
+   * 头像
+   */
+  @Column
+  private String avatar;
+
   @Column(name = "create_at")
   private String createAt;
 

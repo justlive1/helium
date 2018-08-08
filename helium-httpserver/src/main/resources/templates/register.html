@@ -48,7 +48,7 @@
   layui.use(['form', 'layer'], function () {
     layui.form.on('submit(register)', function (data) {
       if (data.field.password != data.field.repassword) {
-        layui.layer.alert("密码输入不一致");
+        layui.layer.msg("密码输入不一致");
         return false;
       }
       var param = {username: data.field.username, password: data.field.password};
@@ -59,13 +59,13 @@
         data: JSON.stringify(param),
         success: function (resp) {
           if (resp.success) {
-            layui.layer.alert("注册成功！");
+            layui.layer.msg("注册成功！");
           } else {
-            layui.layer.alert(resp.message);
+            layui.layer.msg(resp.message);
           }
         },
         error: function () {
-          layui.layer.alert("服务器繁忙，请稍后重试！");
+          layui.layer.msg("服务器繁忙，请稍后重试！");
         }
       });
       return false;

@@ -26,14 +26,56 @@ import vip.justlive.helium.base.entity.Friend;
  */
 public class FriendRepository extends Repository<Friend> {
 
-
+  /**
+   * 根据用户id获取我的*
+   *
+   * @param userId 用户id
+   * @return promise
+   */
   public JdbcPromise<ResultSet> findMineFriend(Long userId) {
     JdbcPromise<ResultSet> promise = new JdbcPromise<>();
     jdbcClient().queryWithParams(
-      "select g.id, g.name as groupname,g.order_index,u.id, u.username, u.nickname, u.signature, f.remark"
+      "select g.id, g.name as groupname,g.order_index,u.id, u.username, u.nickname, u.signature, u.avatar, f.remark"
         + " from friend_group g left join friend f on f.friend_group_id = g.id"
         + " left join user u on f.friend_user_id = u.id where g.user_id = ? order by g.order_index",
       new JsonArray().add(userId), promise);
     return promise;
   }
+
+  /**
+   * 统计查找好友总数
+   *
+   * @param keyword 关键字
+   * @param userId 用户id
+   * @return promise
+   */
+  public JdbcPromise<JsonArray> countFindFriend(String keyword, Long userId) {
+    JdbcPromise<JsonArray> promise = new JdbcPromise<>();
+    jdbcClient().querySingleWithParams(
+      "select count(*) from user u where ((username like ? || '%') or (nickname like ? || '%'))"
+        + " and id != ? and id not in (select f.friend_user_id from friend f where f.user_id = ?) ",
+      new JsonArray().add(keyword).add(keyword).add(userId).add(userId), promise);
+    return promise;
+  }
+
+  /**
+   * 查找好友
+   *
+   * @param keyword 关键字
+   * @param userId 用户id
+   * @param offset 偏移量
+   * @param limit 分页限制
+   * @return promise
+   */
+  public JdbcPromise<ResultSet> findFriend(String keyword, Long userId, int offset, int limit) {
+    JdbcPromise<ResultSet> promise = new JdbcPromise<>();
+    jdbcClient().queryWithParams("select id, username, nickname, signature, avatar from "
+        + " (select u.* from user u where ((username like ? || '%') or (nickname like ? || '%'))"
+        + " and id != ? and id not in (select f.friend_user_id from friend f where f.user_id = ?) "
+        + " order by create_at desc) tm limit ?, ?",
+      new JsonArray().add(keyword).add(keyword).add(userId).add(userId).add(offset).add(limit),
+      promise);
+    return promise;
+  }
+
 }

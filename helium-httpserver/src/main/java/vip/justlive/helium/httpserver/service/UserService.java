@@ -70,7 +70,7 @@ public class UserService extends BaseService {
         String raw = encoder.encode(password);
         model.setPassword(raw);
         model.setNickname(model.getUsername());
-        model.setSignature("这个人很懒，什么都没留下。");
+        model.setAvatar("/static/image/avatar.jpg");
         userRepository.save(model).succeeded(r -> userRepository.findByModel(model).then(u -> {
           FriendGroup group = new FriendGroup();
           group.setName("我的好友");

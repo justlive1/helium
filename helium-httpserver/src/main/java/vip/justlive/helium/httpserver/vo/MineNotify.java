@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -16,18 +16,23 @@ package vip.justlive.helium.httpserver.vo;
 import lombok.Data;
 
 /**
- * 用户
+ * 我的通知
  *
  * @author wubo
  */
 @Data
-public class Mine {
+public class MineNotify {
 
-  private String id;
-  private String username;
-  private String nickname;
-  private String status;
-  private String sign;
-  private String avatar;
+  private Long id;
+
+  private Integer type;
+
+  private Mine from;
+
+  private Integer status;
+
+  private String remark;
+
+  private String createAt;
 
 }

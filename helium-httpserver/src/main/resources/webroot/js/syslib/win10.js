@@ -460,15 +460,6 @@ window.Win10 = {
       layui.$("#win10_btn_time").html(hours + ':' + mins + '<br/>' + year + '/'
         + month + '/' + date);
     }, 1000);
-    //离开前警告
-//        document.body.onbeforeunload = function(event){
-//            var rel = Win10.lang( '系统可能不会保存您所做的更改','The system may not save the changes you have made.');
-//            if(!window.event){
-//                event.returnValue=rel;
-//            }else{
-//                window.event.returnValue=rel;
-//            }
-//        };
     Win10.buildList();//预处理左侧菜单
     Win10._startAnimate();//动画处理
     Win10.renderShortcuts();//渲染图标
@@ -501,13 +492,13 @@ window.Win10 = {
         'The page is supported by qq11419041@163.com. \nFor more info: http://gitee.com/justlive1\n easy to create a unique portal website.'))
     }, 2000);
     //点击清空右键菜单
-    layui.$(document).click(function (event) {
+    layui.$("#win10").click(function (event) {
       if (!event.button) {
         Win10._removeContextMenu();
       }
     });
     //禁用右键的右键
-    layui.$(document).on('contextmenu', '.win10-context-menu', function (e) {
+    layui.$("#win10").on('contextmenu', '.win10-context-menu', function (e) {
       e.preventDefault();
       e.stopPropagation();
     });

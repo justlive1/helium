@@ -14,10 +14,9 @@
 package vip.justlive.helium.httpserver.controller;
 
 import io.vertx.ext.web.RoutingContext;
-import vip.justlive.common.web.vertx.annotation.VertxRequestBody;
+import vip.justlive.common.web.vertx.annotation.VertxRequestParam;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
-import vip.justlive.helium.base.entity.Friend;
 import vip.justlive.helium.httpserver.service.FriendService;
 
 /**
@@ -45,18 +44,54 @@ public class FriendController extends BaseController {
   }
 
   /**
-   * 添加好友
+   * 查询好友
    *
-   * @param friend 好友信息
+   * @param keyword 关键字
+   * @param type 类型
+   * @param pageIndex 第几页
+   * @param pageSize 每页条数
    * @param ctx 上下文
    */
-  @VertxRouteMapping("/addFriend")
-  public void addFriend(@VertxRequestBody Friend friend, RoutingContext ctx) {
-    if (friend.getFriendGroupId() == null || friend.getFriendUserId() == null) {
-      ctx.fail(400);
+  @VertxRouteMapping("/find")
+  public void find(@VertxRequestParam("keyword") String keyword,
+    @VertxRequestParam("type") Integer type, @VertxRequestParam("pageIndex") Integer pageIndex,
+    @VertxRequestParam("pageSize") Integer pageSize, RoutingContext ctx) {
+    if (type == 0) {
+      friendService.findFriend(keyword, user(ctx).getId(), pageIndex, pageSize, ctx);
     } else {
-      friendService.addFriend(friend, sessionId(ctx), ctx);
+      ctx.fail(400);
     }
   }
 
+  /**
+   * 添加好友
+   *
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/addFriend")
+  public void addFriend(@VertxRequestParam("groupId") Long groupId,
+    @VertxRequestParam("to") Long to, @VertxRequestParam("remark") String remark,
+    RoutingContext ctx) {
+    friendService.addFriend(user(ctx).getId(), to, groupId, remark, ctx);
+  }
+
+  /**
+   * 统计未读通知
+   *
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/countMineUnreadNotifies")
+  public void countMineUnreadNotifies(RoutingContext ctx) {
+    friendService.countUnreadNotifies(user(ctx).getId(), ctx);
+  }
+
+  /**
+   * 获取我的通知
+   *
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/findMineNotifies")
+  public void findMineNotifies(RoutingContext ctx) {
+    friendService.findMineNotifies(user(ctx).getId(), ctx);
+  }
 }

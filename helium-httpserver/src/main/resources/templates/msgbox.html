@@ -1,0 +1,70 @@
+<!--
+  ~  Copyright (C) 2018 justlive1
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License
+  ~ is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+  ~ or implied. See the License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>消息盒子</title>
+  <link href="/static/js/layui-v2.3.0/css/layui.css" rel="stylesheet">
+  <link href="/static/css/him.css" rel="stylesheet">
+</head>
+<body>
+
+<ul class="layim-msgbox" id="msgbox-view"></ul>
+
+<script id="msgbox-tpl" type="text/html">
+  {{# layui.each(d.notifies, function(index, item){
+  if(item.type === 0){ }}
+  <li data-id="{{ item.id }}">
+    <a>
+      <img src="{{ item.from.avatar }}" class="layui-circle layim-msgbox-avatar">
+    </a>
+    <p class="layim-msgbox-user">
+      <a>{{ item.from.username + '(' + (item.from.nickname || item.from.username) + ')' }}</a>
+      <span>{{ item.timeAgo }}</span>
+    </p>
+    <p class="layim-msgbox-content">
+      申请添加您为好友
+      <span>{{ item.remark ? '附言: '+item.remark : '' }}</span>
+    </p>
+    <p class="layim-msgbox-btn">
+      {{# if(item.status === 0){ }}
+      <button class="layui-btn layui-btn-small msgbox-type-agree">同意</button>
+      <button class="layui-btn layui-btn-small layui-btn-primary msgbox-type-refuse">拒绝</button>
+      {{# } else if(item.status === 1){ }}
+      已同意
+      {{# } else { }}
+      已拒绝
+      {{# } }}
+    </p>
+
+  </li>
+  {{# } else { }}
+  <li class="layim-msgbox-system">
+    <p><em>系统：</em>{{ item.remark }}<span>{{ item.timeAgo }}</span></p>
+  </li>
+  {{# } }); }}
+  <li class="layim-msgbox-tips">暂无更多新消息</li>
+</script>
+
+<div class="lay-page" id="msgbox-page-view"></div>
+
+<script type="text/javascript" src="/static/js/layui-v2.3.0/layui.js"></script>
+<script type="text/javascript" src="/static/js/syslib/msgbox.js"></script>
+<script>
+
+</script>
+</body>
+</html>

@@ -58,11 +58,11 @@
             parent.window.initIM();
             Win10_child.close();
           } else {
-            layui.layer.alert(resp.message);
+            layui.layer.msg(resp.message);
           }
         },
         error: function () {
-          layui.layer.alert("用户名或密码不正确！");
+          layui.layer.msg("用户名或密码不正确！");
         }
       });
       return false;

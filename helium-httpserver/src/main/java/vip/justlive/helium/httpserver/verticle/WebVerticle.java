@@ -50,7 +50,7 @@ public class WebVerticle extends BaseWebVerticle {
     Router router = Router.router(vertx);
     baseRoute("(https|http)://.*", router);
     router.route("/").handler(ctx -> ctx.reroute("/index.html"));
-    router.route("/static/*").handler(StaticHandler.create());
+    router.route("/static/*").handler(StaticHandler.create().setCachingEnabled(false));
     router.route().handler(UserSessionHandler.create(jwtAuth));
     router.route(authConf.getAuthUrlPattern()).handler(new TokenJWTAuthHandlerImpl(jwtAuth, null));
     serviceRoute(router, "vip.justlive.helium");

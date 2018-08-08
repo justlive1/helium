@@ -11,7 +11,8 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-layui.use(['jquery', 'layer', 'layim'], function () {
+
+layui.define(['jquery', 'layer', 'layim'], function () {
   Win10.onReady(function () {
     Win10.setAnimated(['animated flip', 'animated bounceIn'], 0.01);
     var bgUrl = {
@@ -61,13 +62,30 @@ layui.use(['jquery', 'layer', 'layim'], function () {
     window.him = him;
   }
 
+  function countMineUnreadNotifies() {
+    layui.$.ajax({
+      url: '/interface/friend/countMineUnreadNotifies',
+      method: 'post',
+      success: function (resp) {
+        if (resp.success && resp.data > 0) {
+          layui.layim.msgbox(resp.data);
+        } else if (!resp.success) {
+          layui.layer.msg(resp.message);
+        }
+      },
+      error: function () {
+        layui.layer.msg("获取未读通知失败！");
+      }
+    });
+  }
+
   function initHimUi() {
     layui.$.ajax({
       url: "/interface/friend/mine",
       type: 'post',
       success: function (resp) {
         if (!resp.success) {
-          layui.layer.alert(resp.message);
+          layui.layer.msg(resp.message);
           return;
         }
         layui.layim.config({
@@ -86,13 +104,14 @@ layui.use(['jquery', 'layer', 'layim'], function () {
           initSkin: '2.jpg',
           min: false,
           notice: false,
-          msgbox: '/layim/demo/msgbox.html',
-          find: '/layim/demo/find.html', //发现页面地址，若不开启，剔除该项即可
-          chatLog: '/layim/demo/chatlog.html' //聊天记录页面地址，若不开启，剔除该项即可
+          msgbox: '/interface/msgbox.html',
+          find: '/interface/find.html',
+          chatLog: '/interface/chatlog.html'
         });
+        countMineUnreadNotifies();
       },
       error: function () {
-        layui.layer.alert("服务器繁忙，请稍后重试！");
+        layui.layer.msg("服务器繁忙，请稍后重试！");
       }
     });
   }
@@ -109,7 +128,7 @@ layui.use(['jquery', 'layer', 'layim'], function () {
         if (rsp.status === 401) {
           openLoginPage();
         } else {
-          layui.layer.alert("服务器繁忙，请稍后重试！");
+          layui.layer.msg("服务器繁忙，请稍后重试！");
         }
       }
     });

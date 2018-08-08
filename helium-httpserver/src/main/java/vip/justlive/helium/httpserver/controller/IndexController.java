@@ -20,8 +20,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
+import vip.justlive.common.web.vertx.tmpl.DelegateTemplateEngine;
 import vip.justlive.helium.base.config.WebImConf;
-import vip.justlive.helium.base.tmpl.DelegateTemplateEngine;
 
 /**
  * 页面路由
@@ -72,6 +72,36 @@ public class IndexController {
     WebImConf conf = ConfigFactory.load(WebImConf.class);
     ctx.put("webImConf", conf);
     htmlEngine.render(ctx, "/index.html");
+  }
+
+  /**
+   * 查找好友页面
+   *
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/interface/find.html")
+  public void find(RoutingContext ctx) {
+    htmlEngine.render(ctx, "/find.html");
+  }
+
+  /**
+   * 消息盒子页面
+   *
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/interface/msgbox.html")
+  public void msgbox(RoutingContext ctx) {
+    htmlEngine.render(ctx, "/msgbox.html");
+  }
+
+  /**
+   * 聊天记录
+   *
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/interface/chatlog.html")
+  public void chatlog(RoutingContext ctx) {
+    htmlEngine.render(ctx, "/chatlog.html");
   }
 
   /**
