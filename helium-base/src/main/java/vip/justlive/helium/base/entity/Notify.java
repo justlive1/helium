@@ -33,10 +33,13 @@ public class Notify implements Serializable {
 
   public enum TYPE {
     /**
+     * 系统通知
+     */
+    SYSTEM(-1),
+    /**
      * 好友通知
      */
     FRIEND(0);
-
     private int value;
 
     TYPE(int value) {
@@ -100,7 +103,7 @@ public class Notify implements Serializable {
   private Long groupId;
 
   /**
-   * 状态 0-待处理 1-已处理
+   * 状态
    */
   @Column
   private Integer status;

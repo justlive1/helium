@@ -44,10 +44,6 @@ ext.libraries = [
     }
   ],
 
-  sqlite     : [
-    dependencies.create("org.xerial:sqlite-jdbc:$sqliteVersion")
-  ],
-
   test       : [
     dependencies.create("junit:junit:$junitVersion") {
       force = true

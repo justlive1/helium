@@ -15,6 +15,7 @@ package vip.justlive.helium.base.repository;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.sql.ResultSet;
+import io.vertx.ext.sql.UpdateResult;
 import vip.justlive.common.web.vertx.datasource.JdbcPromise;
 import vip.justlive.common.web.vertx.datasource.Repository;
 import vip.justlive.helium.base.entity.Notify;
@@ -26,6 +27,12 @@ import vip.justlive.helium.base.entity.Notify;
  */
 public class NotifyRepository extends Repository<Notify> {
 
+  /**
+   * 获取未读通知总数
+   *
+   * @param userId 用户id
+   * @return promise
+   */
   public JdbcPromise<JsonArray> countUnreadNotifies(Long userId) {
     JdbcPromise<JsonArray> promise = new JdbcPromise<>();
     jdbcClient()
@@ -46,6 +53,33 @@ public class NotifyRepository extends Repository<Notify> {
       "select n.id, n.type, n.status, n.remark, n.create_at, u.id as user_id, u.username, u.nickname, u.avatar"
         + " from notify n left join user u on n.from_id = u.id where n.belong_to = ?",
       new JsonArray().add(userId), promise);
+    return promise;
+  }
+
+  /**
+   * 修改未读通知为已读
+   *
+   * @param userId 用户id
+   * @return promise
+   */
+  public JdbcPromise<UpdateResult> updateReadNotifies(Long userId) {
+    JdbcPromise<UpdateResult> promise = new JdbcPromise<>();
+    jdbcClient().updateWithParams("update notify set unread = 0 where belong_to = ? and unread = 1",
+      new JsonArray().add(userId), promise);
+    return promise;
+  }
+
+  /**
+   * 修改通知状态
+   *
+   * @param id 用户id
+   * @param status 状态
+   * @return promise
+   */
+  public JdbcPromise<UpdateResult> updateNotifyStatus(Long id, Integer status) {
+    JdbcPromise<UpdateResult> promise = new JdbcPromise<>();
+    jdbcClient().updateWithParams("update notify set status = ? where id = ?",
+      new JsonArray().add(status).add(id), promise);
     return promise;
   }
 }

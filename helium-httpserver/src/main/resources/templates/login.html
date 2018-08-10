@@ -55,8 +55,8 @@
           if (resp.success) {
             sessionStorage.setItem("token", resp.data.token);
             sessionStorage.setItem("uid", resp.data.uid);
-            parent.window.initIM();
-            Win10_child.close();
+            parent.layui.main.openHimView();
+            layui.Win10_child.close();
           } else {
             layui.layer.msg(resp.message);
           }

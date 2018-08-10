@@ -25,8 +25,8 @@ layui.define(['layim', 'layer', 'flow', 'util'], function (exports) {
           if (resp.success) {
             msgbox.cacheData = {};
             layui.$.each(resp.data, function (index, value) {
-              var timeAgo = layui.util.timeAgo(new Date(value.createAt), true);
-              value.timeAgo = timeAgo;
+              value.timeAgo = layui.util.timeAgo(new Date(value['createAt']),
+                true);
               msgbox.cacheData[value.id] = value;
             });
             var tpl = layui.$("#msgbox-tpl").html();
@@ -60,7 +60,8 @@ layui.define(['layim', 'layer', 'flow', 'util'], function (exports) {
                 url: '/interface/friend/agreeAddFriend',
                 method: 'post',
                 data: {
-                  id: id
+                  id: id,
+                  groupId: group
                 },
                 success: function (resp) {
                   if (resp.success) {
@@ -74,7 +75,7 @@ layui.define(['layim', 'layer', 'flow', 'util'], function (exports) {
                       sign: data.from.sign
                     });
                     parent.layer.close(index);
-                    _this.parent().html("已拒绝");
+                    _this.parent().html("已同意");
                   } else {
                     layui.layer.msg(resp.message);
                   }
@@ -99,6 +100,7 @@ layui.define(['layim', 'layer', 'flow', 'util'], function (exports) {
             success: function (resp) {
               if (resp.success) {
                 _this.parent().html("已拒绝");
+                layui.layer.close(index);
               } else {
                 layui.layer.msg(resp.message);
               }

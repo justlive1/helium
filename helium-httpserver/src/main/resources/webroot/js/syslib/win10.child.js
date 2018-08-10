@@ -11,25 +11,32 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+layui.define(function (exports) {
 
-window.Win10_parent = parent.Win10;
-window.Win10_child = {
-  close: function () {
-    var index = parent.layer.getFrameIndex(window.name);
-    Win10_parent._closeWin(index);
-  },
-  newMsg: function (title, content, handle_click) {
-    Win10_parent.newMsg(title, content, handle_click)
-  },
-  openUrl: function (url, title, max) {
-    var click_lock_name = Math.random();
-    Win10_parent._iframe_click_lock_children[click_lock_name] = true;
-    var index = Win10_parent.openUrl(url, title, max);
-    setTimeout(function () {
-      delete Win10_parent._iframe_click_lock_children[click_lock_name];
-    }, 1000);
-    return index;
-  }
-};
+  var Win10_child = {
+    _init: function () {
+      this.Win10_parent = parent.layui.Win10;
+    },
+    close: function () {
+      var index = parent.layui.layer.getFrameIndex(window.name);
+      this.Win10_parent._closeWin(index);
+    },
+    newMsg: function (title, content, handle_click) {
+      this.Win10_parent.newMsg(title, content, handle_click)
+    },
+    openUrl: function (url, title, max) {
+      var click_lock_name = Math.random();
+      this.Win10_parent._iframe_click_lock_children[click_lock_name] = true;
+      var index = this.Win10_parent.openUrl(url, title, max);
+      setTimeout(function () {
+        delete this.Win10_parent._iframe_click_lock_children[click_lock_name];
+      }, 1000);
+      return index;
+    }
+  };
+
+  Win10_child._init();
+  exports('Win10_child', Win10_child);
+});
 
 

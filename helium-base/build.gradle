@@ -17,7 +17,7 @@ dependencies {
   compile libraries.commons
   compile libraries.logging
   compile libraries.vertx
-  compile libraries.sqlite
+  compile libraries.mysql
 
   compile "com.zaxxer:HikariCP:$hikariCPVersion"
 }

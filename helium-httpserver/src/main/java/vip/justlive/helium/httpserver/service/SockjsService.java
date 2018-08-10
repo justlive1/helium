@@ -19,10 +19,8 @@ import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
-import vip.justlive.helium.base.constant.MessageCode;
 
 /**
  * sockjs服务
@@ -32,13 +30,13 @@ import vip.justlive.helium.base.constant.MessageCode;
 @Slf4j
 public class SockjsService implements Handler<BridgeEvent> {
 
-  private Map<BridgeEventType, BiConsumer<Long, JsonObject>> functions = new HashMap<>();
+  private Map<BridgeEventType, BiConsumer<Long, JsonObject>> functions = new HashMap<>(8);
 
   public SockjsService() {
     init();
   }
 
-  void init() {
+  private void init() {
     functions.put(BridgeEventType.SEND, this::handleForSend);
   }
 
@@ -49,6 +47,7 @@ public class SockjsService implements Handler<BridgeEvent> {
       Long uid = event.socket().webUser().principal().getLong("uid");
       JsonObject data = event.getRawMessage();
       consumer.accept(uid, data);
+      event.setRawMessage(data);
     }
     event.complete(true);
   }
@@ -58,17 +57,10 @@ public class SockjsService implements Handler<BridgeEvent> {
       log.debug("uid[{}] data[{}]", uid, data);
     }
 
-    String code = data.getString("code");
-    if (Objects.equals(code, MessageCode.M_300.name())) {
-      JsonObject message = data.getJsonObject("data");
-      if (message != null) {
-        message.getString("from");
-        message.getString("to");
-        message.getString("msg");
-      } else {
-        log.warn("msg is null uid[{}] data[{}]", uid, data);
-      }
-    }
+    JsonObject headers = data.getJsonObject("headers", new JsonObject());
+    //添加时间戳
+    headers.put("timestamp", System.currentTimeMillis());
+    data.put("headers", headers);
 
   }
 

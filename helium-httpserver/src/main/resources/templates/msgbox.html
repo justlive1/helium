@@ -53,7 +53,17 @@
   </li>
   {{# } else { }}
   <li class="layim-msgbox-system">
-    <p><em>系统：</em>{{ item.remark }}<span>{{ item.timeAgo }}</span></p>
+    <p>
+      <em>系统：</em>
+      {{ item.from.username }}
+      {{# if(item.status === 1){ }}
+      同意
+      {{# }else{ }}
+      拒绝
+      {{# } }}
+      了你的申请
+      <span>{{ item.timeAgo }}</span>
+    </p>
   </li>
   {{# } }); }}
   <li class="layim-msgbox-tips">暂无更多新消息</li>

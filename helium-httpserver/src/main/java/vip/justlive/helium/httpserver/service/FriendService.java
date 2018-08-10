@@ -26,6 +26,7 @@ import vip.justlive.common.base.domain.Page;
 import vip.justlive.common.web.vertx.datasource.JdbcPromise;
 import vip.justlive.common.web.vertx.datasource.ModelPromise;
 import vip.justlive.common.web.vertx.datasource.RepositoryFactory;
+import vip.justlive.helium.base.entity.Friend;
 import vip.justlive.helium.base.entity.Notify;
 import vip.justlive.helium.base.entity.Notify.STATUS;
 import vip.justlive.helium.base.entity.Notify.TYPE;
@@ -108,9 +109,9 @@ public class FriendService extends BaseService {
             list.forEach(jsonArray -> friends.add(convertToMine(jsonArray)));
           }
           success(new Page<>(pageIndex, pageSize, total, friends), ctx);
-        }).failed(rs -> ctx.fail(500));
+        }).failed(rs -> fail(ctx));
       }
-    }).failed(r -> ctx.fail(500));
+    }).failed(r -> fail(ctx));
   }
 
   /**
@@ -147,7 +148,7 @@ public class FriendService extends BaseService {
     notifyRepository.countUnreadNotifies(userId).succeeded(r -> {
       long total = r.getLong(0);
       success(total, ctx);
-    }).failed(r -> ctx.fail(500));
+    }).failed(r -> fail(ctx));
   }
 
   /**
@@ -157,14 +158,80 @@ public class FriendService extends BaseService {
    * @param ctx 上下文
    */
   public void findMineNotifies(Long userId, RoutingContext ctx) {
-    notifyRepository.findMineNotifies(userId).failed(r -> ctx.fail(500)).succeeded(rs -> {
+    notifyRepository.findMineNotifies(userId).failed(r -> fail(ctx)).succeeded(rs -> {
       List<JsonArray> list = rs.getResults();
       List<MineNotify> result = new ArrayList<>(10);
       if (list != null && !list.isEmpty()) {
         list.forEach(item -> result.add(convertToMineNotify(item)));
       }
       success(result, ctx);
-    });
+    }).succeeded(rs -> notifyRepository.updateReadNotifies(userId));
+  }
+
+  /**
+   * 同意好友添加
+   *
+   * @param id 通知id
+   * @param groupId 分组id
+   * @param ctx 上下文
+   */
+  public void agreeAddFriend(Long id, Long groupId, RoutingContext ctx) {
+    notifyRepository.findById(id).then(notify -> {
+      if (notify == null || notify.getStatus() != STATUS.PENDING.value()) {
+        fail(ctx);
+      } else {
+        // to 添加 from
+        Friend friend = new Friend();
+        friend.setFriendGroupId(groupId);
+        friend.setFriendUserId(notify.getFromId());
+        friend.setUserId(notify.getToId());
+        friendRepository.save(friend).failed(r -> fail(ctx)).succeeded(r -> {
+          // from 添加 to
+          friend.setUserId(notify.getFromId());
+          friend.setFriendUserId(notify.getToId());
+          friend.setFriendGroupId(notify.getGroupId());
+          friendRepository.save(friend)
+            .succeeded(rs -> notifyRepository.updateNotifyStatus(id, STATUS.PASSED.value())
+              .succeeded(ur -> {
+                // 在线通知 TODO
+                success(ctx);
+              }))
+            .failed(rs -> fail(ctx));
+        });
+      }
+    }).failed(r -> fail(ctx));
+  }
+
+  /**
+   * 拒绝好友添加
+   *
+   * @param id 通知id
+   * @param ctx 上下文
+   */
+  public void refuseAddFriend(Long id, RoutingContext ctx) {
+    notifyRepository.findById(id).then(notify -> {
+      if (notify.getStatus() != STATUS.PENDING.value()) {
+        fail(ctx);
+        return;
+      }
+      //修改状态
+      notifyRepository.updateNotifyStatus(id, STATUS.REFUSED.value()).failed(r -> fail(ctx))
+        .succeeded(r -> {
+          //记录拒绝通知
+          Notify refuseNotify = new Notify();
+          refuseNotify.setUnread(1);
+          refuseNotify.setBelongTo(notify.getFromId());
+          refuseNotify.setStatus(STATUS.REFUSED.value());
+          refuseNotify.setExpire(0);
+          refuseNotify.setGroupId(notify.getGroupId());
+          refuseNotify.setType(TYPE.SYSTEM.value());
+          refuseNotify.setFromId(notify.getToId());
+          refuseNotify.setToId(notify.getFromId());
+          notifyRepository.save(refuseNotify);
+          // 在线需要发送通知 TODO
+          success(ctx);
+        });
+    }).failed(r -> fail(ctx));
   }
 
   private ModelPromise<User> findMine(Long userId, RoutingContext ctx, Map<String, Object> result) {
@@ -172,7 +239,7 @@ public class FriendService extends BaseService {
       if (user == null) {
         ctx.fail(403);
       } else {
-        Mine mine = create(user.getUsername(), user.getUsername(), user.getNickname(),
+        Mine mine = create(user.getId().toString(), user.getUsername(), user.getNickname(),
           user.getSignature(), user.getAvatar());
         mine.setStatus("online");
         result.put("mine", mine);
@@ -205,7 +272,7 @@ public class FriendService extends BaseService {
       } else {
         result.put("friend", Collections.emptyList());
       }
-    }).failed(r -> ctx.fail(500));
+    }).failed(r -> fail(ctx));
   }
 
   private Mine create(String id, String username, String nickname, String sign, String avatar) {

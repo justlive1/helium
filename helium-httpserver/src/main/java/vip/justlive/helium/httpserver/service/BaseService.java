@@ -24,7 +24,7 @@ import vip.justlive.common.base.domain.Response;
  *
  * @author wubo
  */
-public abstract class BaseService {
+public class BaseService {
 
   public void success(RoutingContext ctx) {
     ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON.toString())
@@ -44,6 +44,10 @@ public abstract class BaseService {
   public void error(String code, String msg, RoutingContext ctx) {
     ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON.toString())
       .end(JsonObject.mapFrom(Response.error(code, msg)).toBuffer());
+  }
+
+  public void fail(RoutingContext ctx) {
+    ctx.fail(500);
   }
 
 }

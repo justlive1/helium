@@ -63,10 +63,14 @@
       }
     };
 
-    this._createEventBus = function () {
+    this.close = function () {
       if (this.eventBus && this.eventBus.close) {
         this.eventBus.close();
       }
+    };
+
+    this._createEventBus = function () {
+      this.close();
       var eb = new EventBus(_url + "?_token=" + _token, {
         vertxbus_ping_interval: 5000,
         vertxbus_reconnect_attempts_max: Infinity,
@@ -81,7 +85,7 @@
         eb.registerHandler('im.user.' + _id, function (error, message) {
           if (_this.receiveMsgHandler && typeof _this.receiveMsgHandler
             === 'function') {
-            _this.receiveMsgHandler.call(message);
+            _this.receiveMsgHandler.call(window, message);
           } else {
             console.log(
               'no handler for this received  message: ' + JSON.stringify(
@@ -94,7 +98,7 @@
 
       eb.onerror = function (err) {
         if (_this.errorHandler && typeof _this.errorHandler === 'function') {
-          _this.errorHandler.call(err);
+          _this.errorHandler.call(window, err);
         } else {
           console.log('no handler for this error; ' + err);
         }
@@ -102,7 +106,7 @@
 
       eb.onclose = function (err) {
         if (_this.closedHander && typeof _this.closedHander === 'function') {
-          _this.closedHander.call(err);
+          _this.closedHander.call(window, err);
         } else {
           console.log(err);
         }
@@ -117,16 +121,26 @@
       return true;
     };
 
-    this.sendToServer = function (code, data) {
+    this.sendToServer = function (code, data, callback) {
       if (this._check()) {
-        this.eventBus.send('im.server', {code: code, data: data});
+        this.eventBus.send('im.server', {code: code, data: data},
+          function (err, reply) {
+            if (callback && typeof callback === 'function') {
+              callback.call(window, err, reply);
+            }
+          });
       }
     };
 
-    this.sendMsgToFriend = function (id, msg) {
+    this.sendMsgToFriend = function (id, data, callback) {
       if (this._check()) {
         this.eventBus.send('im.user.' + id,
-          {code: 'M_300', data: {from: _id, to: id, msg: msg}});
+          {code: 'M_300', from: _id, to: id, data: data},
+          function (err, reply) {
+            if (callback && typeof callback === 'function') {
+              callback.call(window, err, reply);
+            }
+          });
       }
     }
 

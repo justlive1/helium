@@ -36,7 +36,7 @@ public class FriendController extends BaseController {
   /**
    * 我的*
    *
-   * @param ctx
+   * @param ctx 上下文
    */
   @VertxRouteMapping("/mine")
   public void mine(RoutingContext ctx) {
@@ -93,5 +93,28 @@ public class FriendController extends BaseController {
   @VertxRouteMapping("/findMineNotifies")
   public void findMineNotifies(RoutingContext ctx) {
     friendService.findMineNotifies(user(ctx).getId(), ctx);
+  }
+
+  /**
+   * 同意添加好友
+   *
+   * @param id id
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/agreeAddFriend")
+  public void agreeAddFriend(@VertxRequestParam("id") Long id,
+    @VertxRequestParam("groupId") Long groupId, RoutingContext ctx) {
+    friendService.agreeAddFriend(id, groupId, ctx);
+  }
+
+  /**
+   * 拒绝添加好友
+   *
+   * @param id id
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/refuseAddFriend")
+  public void refuseAddFriend(@VertxRequestParam("id") Long id, RoutingContext ctx) {
+    friendService.refuseAddFriend(id, ctx);
   }
 }

@@ -52,7 +52,7 @@ public class FriendRepository extends Repository<Friend> {
   public JdbcPromise<JsonArray> countFindFriend(String keyword, Long userId) {
     JdbcPromise<JsonArray> promise = new JdbcPromise<>();
     jdbcClient().querySingleWithParams(
-      "select count(*) from user u where ((username like ? || '%') or (nickname like ? || '%'))"
+      "select count(*) from user u where ((username like concat(?, '%')) or (nickname like concat(?, '%')))"
         + " and id != ? and id not in (select f.friend_user_id from friend f where f.user_id = ?) ",
       new JsonArray().add(keyword).add(keyword).add(userId).add(userId), promise);
     return promise;
@@ -70,7 +70,7 @@ public class FriendRepository extends Repository<Friend> {
   public JdbcPromise<ResultSet> findFriend(String keyword, Long userId, int offset, int limit) {
     JdbcPromise<ResultSet> promise = new JdbcPromise<>();
     jdbcClient().queryWithParams("select id, username, nickname, signature, avatar from "
-        + " (select u.* from user u where ((username like ? || '%') or (nickname like ? || '%'))"
+        + " (select u.* from user u where ((username like concat(?, '%')) or (nickname like concat(?, '%')))"
         + " and id != ? and id not in (select f.friend_user_id from friend f where f.user_id = ?) "
         + " order by create_at desc) tm limit ?, ?",
       new JsonArray().add(keyword).add(keyword).add(userId).add(userId).add(offset).add(limit),
