@@ -77,7 +77,7 @@ layui.define(['jquery', 'layer', 'layim'], function (exports) {
         method: 'post',
         success: function (resp) {
           if (resp.success && resp.data > 0) {
-            layui.layim.msgbox(resp.data);
+            main.addMsgboxCount(resp.data);
           } else if (!resp.success) {
             layui.layer.msg(resp.message);
           }
@@ -156,7 +156,8 @@ layui.define(['jquery', 'layer', 'layim'], function (exports) {
 
       // 监听接收消息
       main.him.addReceiveMsgHandler(main.receiveMsgHandler);
-
+      // 监听接收通知
+      main.him.addReceiveNotifyHandler(main.receiveNotifyHandler);
     },
 
     initHimWithJs: function () {
@@ -190,6 +191,39 @@ layui.define(['jquery', 'layer', 'layim'], function (exports) {
         fromid: data.body.data.from.id,
         timestamp: Number(data.headers.timestamp)
       });
+    },
+
+    receiveNotifyHandler: function (data) {
+      main.addMsgboxCount(1);
+      if (data.body.type === -1) {
+        main.systemNotify(data);
+      } else if (data.body.type === 0) {
+        main.addFriendNotify(data);
+      }
+    },
+
+    systemNotify: function (data) {
+      var msg = data.body.from.username + (data.body.status === 1
+        ? ' 同意 ' : ' 拒绝 ') + "了你的申请";
+      layui.layer.msg(msg);
+      if (data.body.status === 1) {
+        var friend = data.body.from;
+        friend.groupid = data.body.groupId;
+        layui.layim.addList(friend);
+      }
+    },
+
+    addFriendNotify: function (data) {
+      var msg = data.body.from.username + " 申请添加你为好友";
+      layui.layer.msg(msg);
+    },
+
+    addMsgboxCount: function (count) {
+      if (layui.layim.cache().msgbox) {
+        count += layui.layim.cache().msgbox;
+      }
+      layui.layim.msgbox(count);
+      layui.layim.cache().msgbox = count;
     }
   };
 

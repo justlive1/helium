@@ -2,7 +2,7 @@
 drop table if exists user;
 create table user
 (
-  id int not null primary key auto_increment,
+  id bigint not null primary key auto_increment,
   username varchar(40) comment '用户名' not null,
   password varchar(40) comment '密码' not null,
   nickname varchar(40) comment '昵称',

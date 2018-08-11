@@ -47,6 +47,10 @@
       this.receiveMsgHandler = callback;
     };
 
+    this.addReceiveNotifyHandler = function (callback) {
+      this.receiveNotifyHandler = callback;
+    };
+
     this.addErrorHandler = function (callback) {
       this.errorHandler = callback;
     };
@@ -82,16 +86,30 @@
 
       eb.enableReconnect(true);
       eb.onopen = function () {
-        eb.registerHandler('im.user.' + _id, function (error, message) {
-          if (_this.receiveMsgHandler && typeof _this.receiveMsgHandler
-            === 'function') {
-            _this.receiveMsgHandler.call(window, message);
-          } else {
-            console.log(
-              'no handler for this received  message: ' + JSON.stringify(
-              message));
-          }
-        });
+        // 接收用户聊天
+        eb.registerHandler([[${msgUserToUser}]] + _id,
+          function (error, message) {
+            if (_this.receiveMsgHandler && typeof _this.receiveMsgHandler
+              === 'function') {
+              _this.receiveMsgHandler.call(window, message);
+            } else {
+              console.log(
+                'no handler for this received  message: ' + JSON.stringify(
+                message));
+            }
+          });
+        // 接收服务器通知
+        eb.registerHandler([[${notifyServerToUser}]] + _id,
+          function (error, message) {
+            if (_this.receiveNotifyHandler && typeof _this.receiveNotifyHandler
+              === 'function') {
+              _this.receiveNotifyHandler.call(window, message);
+            } else {
+              console.log(
+                'no handler for this received  notify: ' + JSON.stringify(
+                message));
+            }
+          });
         _this.eventBus = eb;
         _this.sendToServer('M_200');
       };
@@ -123,7 +141,8 @@
 
     this.sendToServer = function (code, data, callback) {
       if (this._check()) {
-        this.eventBus.send('im.server', {code: code, data: data},
+        this.eventBus.send([[${userToServer}]],
+          {code: code, data: data},
           function (err, reply) {
             if (callback && typeof callback === 'function') {
               callback.call(window, err, reply);
@@ -134,7 +153,7 @@
 
     this.sendMsgToFriend = function (id, data, callback) {
       if (this._check()) {
-        this.eventBus.send('im.user.' + id,
+        this.eventBus.send([[${msgUserToUser}]] + id,
           {code: 'M_300', from: _id, to: id, data: data},
           function (err, reply) {
             if (callback && typeof callback === 'function') {

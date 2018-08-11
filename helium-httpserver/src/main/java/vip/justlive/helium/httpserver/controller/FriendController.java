@@ -59,7 +59,7 @@ public class FriendController extends BaseController {
     if (type == 0) {
       friendService.findFriend(keyword, user(ctx).getId(), pageIndex, pageSize, ctx);
     } else {
-      ctx.fail(400);
+      fail(ctx);
     }
   }
 

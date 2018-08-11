@@ -28,7 +28,7 @@ import vip.justlive.helium.httpserver.service.UserService;
  * @author wubo
  */
 @VertxRoute
-public class UserController {
+public class UserController extends BaseController {
 
   private final UserService userService;
 
@@ -45,7 +45,7 @@ public class UserController {
   @VertxRouteMapping(value = "/register", method = {HttpMethod.POST})
   public void register(@VertxRequestBody User user, RoutingContext ctx) {
     if (!StringUtils.isNoneBlank(user.getUsername(), user.getPassword())) {
-      ctx.fail(400);
+      fail(ctx);
     } else {
       userService.register(user.getUsername(), user.getPassword(), ctx);
     }
@@ -60,7 +60,7 @@ public class UserController {
   @VertxRouteMapping(value = "/login", method = {HttpMethod.POST})
   public void login(@VertxRequestBody User user, RoutingContext ctx) {
     if (!StringUtils.isNoneBlank(user.getUsername(), user.getPassword())) {
-      ctx.fail(400);
+      fail(ctx);
     } else {
       userService.login(user.getUsername(), user.getPassword(), ctx);
     }

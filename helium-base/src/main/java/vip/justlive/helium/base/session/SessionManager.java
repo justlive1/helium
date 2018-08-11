@@ -26,10 +26,17 @@ public interface SessionManager {
    * 创建session
    *
    * @param user 用户
-   * @param token 登录授权码
    * @return 会话
    */
-  Session create(User user, String token);
+  Session create(User user);
+
+  /**
+   * 获取session
+   *
+   * @param token token
+   * @return 会话
+   */
+  Session getSessionByToken(String token);
 
   /**
    * 获取session
@@ -37,7 +44,7 @@ public interface SessionManager {
    * @param sessionId 会话id
    * @return 会话
    */
-  Session getSession(String sessionId);
+  Session getSessionById(String sessionId);
 
   /**
    * 删除session

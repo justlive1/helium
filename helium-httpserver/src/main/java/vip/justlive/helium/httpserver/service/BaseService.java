@@ -26,26 +26,55 @@ import vip.justlive.common.base.domain.Response;
  */
 public class BaseService {
 
+  /**
+   * 请求成功
+   *
+   * @param ctx 上下文
+   */
   public void success(RoutingContext ctx) {
     ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON.toString())
       .end(JsonObject.mapFrom(Response.success()).toBuffer());
   }
 
+  /**
+   * 请求成功
+   *
+   * @param data 消息体
+   * @param ctx 上下文
+   */
   public void success(Object data, RoutingContext ctx) {
     ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON.toString())
       .end(JsonObject.mapFrom(Response.success(data)).toBuffer());
   }
 
+  /**
+   * 请求失败
+   *
+   * @param msg 错误消息
+   * @param ctx 上下文
+   */
   public void error(String msg, RoutingContext ctx) {
     ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON.toString())
       .end(JsonObject.mapFrom(Response.error(msg)).toBuffer());
   }
 
+  /**
+   * 请求失败
+   *
+   * @param code 错误码
+   * @param msg 错误消息
+   * @param ctx 上下文
+   */
   public void error(String code, String msg, RoutingContext ctx) {
     ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON.toString())
       .end(JsonObject.mapFrom(Response.error(code, msg)).toBuffer());
   }
 
+  /**
+   * 服务器错误
+   *
+   * @param ctx 上下文
+   */
   public void fail(RoutingContext ctx) {
     ctx.fail(500);
   }

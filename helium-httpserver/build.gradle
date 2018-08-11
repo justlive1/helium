@@ -19,8 +19,8 @@ dependencies {
 
 jar {
   manifest {
-    attributes "Main-Class": "vip.justlive.helium.base.JustLive"
-    attributes "Main-Verticle": "vip.justlive.helium.base.MainVerticle"
+    attributes "Main-Class": "vip.justlive.common.web.vertx.JustLive"
+    attributes "Main-Verticle": "vip.justlive.common.web.vertx.core.MainVerticle"
   }
 
   from {

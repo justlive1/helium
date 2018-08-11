@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-layui.use(['layim', 'laypage', 'form'], function (exports) {
+layui.define(['layim', 'laypage', 'form'], function (exports) {
 
   var find = {
 

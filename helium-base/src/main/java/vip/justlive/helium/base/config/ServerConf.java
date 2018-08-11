@@ -31,6 +31,12 @@ public class ServerConf {
   private Integer port;
 
   /**
+   * 需要认证的路径
+   */
+  @Value("${auth.authUrlPattern:/interface/*}")
+  private String authUrlPattern;
+
+  /**
    * 心跳间隔
    */
   @Value("${server.sockjs.heartBeatInterval:25000}")
@@ -59,4 +65,5 @@ public class ServerConf {
    */
   @Value("${server.sockjs.outboundPermittedPattern:im\\..*}")
   private String sockjsOutboundPermittedPattern;
+
 }

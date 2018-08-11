@@ -15,13 +15,13 @@ package vip.justlive.helium.httpserver.controller;
 
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
-import io.vertx.ext.web.templ.impl.CachingTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
 import vip.justlive.common.web.vertx.tmpl.DelegateTemplateEngine;
 import vip.justlive.helium.base.config.WebImConf;
+import vip.justlive.helium.base.constant.AddressTemplate;
 
 /**
  * 页面路由
@@ -35,8 +35,6 @@ public class IndexController {
   private final DelegateTemplateEngine jsEngine;
 
   public IndexController() {
-    System
-      .setProperty(CachingTemplateEngine.DISABLE_TEMPL_CACHING_PROP_NAME, Boolean.TRUE.toString());
     this.htmlEngine = DelegateTemplateEngine.create(ThymeleafTemplateEngine.create());
     this.jsEngine = DelegateTemplateEngine.create(ThymeleafTemplateEngine.create().setMode(
       TemplateMode.JAVASCRIPT));
@@ -113,6 +111,9 @@ public class IndexController {
   public void himJs(RoutingContext ctx) {
     WebImConf conf = ConfigFactory.load(WebImConf.class);
     ctx.put("webImConf", conf);
+    ctx.put("msgUserToUser", AddressTemplate.MSG_USER_TO_USER.value());
+    ctx.put("notifyServerToUser", AddressTemplate.NOTIFY_SERVER_TO_USER.value());
+    ctx.put("userToServer", AddressTemplate.USER_TO_SERVER.value());
     jsEngine.render(ctx, "/him.js");
   }
 

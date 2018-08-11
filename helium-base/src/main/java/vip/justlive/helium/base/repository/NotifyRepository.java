@@ -50,9 +50,18 @@ public class NotifyRepository extends Repository<Notify> {
   public JdbcPromise<ResultSet> findMineNotifies(Long userId) {
     JdbcPromise<ResultSet> promise = new JdbcPromise<>();
     jdbcClient().queryWithParams(
-      "select n.id, n.type, n.status, n.remark, n.create_at, u.id as user_id, u.username, u.nickname, u.avatar"
+      "select n.id, n.type, n.status, n.remark, n.create_at, n.group_id, u.id as user_id, u.username, u.nickname, u.avatar"
         + " from notify n left join user u on n.from_id = u.id where n.belong_to = ?",
       new JsonArray().add(userId), promise);
+    return promise;
+  }
+
+  public JdbcPromise<JsonArray> findMineNotifyById(Long id) {
+    JdbcPromise<JsonArray> promise = new JdbcPromise<>();
+    jdbcClient().querySingleWithParams(
+      "select n.id, n.type, n.status, n.remark, n.create_at, n.group_id, u.id as user_id, u.username, u.nickname, u.avatar"
+        + " from notify n left join user u on n.from_id = u.id where n.id = ?",
+      new JsonArray().add(id), promise);
     return promise;
   }
 

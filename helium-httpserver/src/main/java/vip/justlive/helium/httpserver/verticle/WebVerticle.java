@@ -13,7 +13,7 @@
  */
 package vip.justlive.helium.httpserver.verticle;
 
-import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
@@ -24,12 +24,12 @@ import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 import lombok.extern.slf4j.Slf4j;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.annotation.VertxVerticle;
-import vip.justlive.common.web.vertx.auth.TokenJWTAuthHandlerImpl;
+import vip.justlive.common.web.vertx.auth.TokenAuthHandlerImpl;
 import vip.justlive.common.web.vertx.core.BaseWebVerticle;
-import vip.justlive.helium.base.config.AuthConf;
 import vip.justlive.helium.base.config.ServerConf;
-import vip.justlive.helium.base.factory.AuthFactory;
 import vip.justlive.helium.httpserver.service.SockjsService;
+import vip.justlive.helium.httpserver.session.SessionManagerImpl;
+import vip.justlive.helium.httpserver.session.SessionTokenAuthProvider;
 
 /**
  * web单元
@@ -43,16 +43,15 @@ public class WebVerticle extends BaseWebVerticle {
   @Override
   public void start() {
 
-    AuthConf authConf = ConfigFactory.load(AuthConf.class);
     ServerConf conf = ConfigFactory.load(ServerConf.class);
-    JWTAuth jwtAuth = AuthFactory.jwtAuth();
+    AuthProvider tokenAuthProvider = new SessionTokenAuthProvider(new SessionManagerImpl());
 
     Router router = Router.router(vertx);
     baseRoute("(https|http)://.*", router);
     router.route("/").handler(ctx -> ctx.reroute("/index.html"));
     router.route("/static/*").handler(StaticHandler.create().setCachingEnabled(false));
-    router.route().handler(UserSessionHandler.create(jwtAuth));
-    router.route(authConf.getAuthUrlPattern()).handler(new TokenJWTAuthHandlerImpl(jwtAuth, null));
+    router.route().handler(UserSessionHandler.create(tokenAuthProvider));
+    router.route(conf.getAuthUrlPattern()).handler(new TokenAuthHandlerImpl(tokenAuthProvider));
     serviceRoute(router, "vip.justlive.helium");
     websocketRoute(router);
 
@@ -62,8 +61,7 @@ public class WebVerticle extends BaseWebVerticle {
 
   private void websocketRoute(Router router) {
     ServerConf conf = ConfigFactory.load(ServerConf.class);
-    AuthConf authConf = ConfigFactory.load(AuthConf.class);
-    router.route(authConf.getAuthUrlPattern()).handler(SockJSHandler.create(vertx,
+    router.route(conf.getAuthUrlPattern()).handler(SockJSHandler.create(vertx,
       new SockJSHandlerOptions().setHeartbeatInterval(conf.getSockjsHeartbeatInterval())).bridge(
       new BridgeOptions().addInboundPermitted(
         new PermittedOptions().setAddressRegex(conf.getSockjsInboundPermittedPattern()))

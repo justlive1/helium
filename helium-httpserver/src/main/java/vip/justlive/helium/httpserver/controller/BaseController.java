@@ -23,11 +23,32 @@ import vip.justlive.helium.base.entity.User;
  */
 public class BaseController {
 
+  /**
+   * 获取登录用户
+   *
+   * @param ctx 上下文
+   * @return 用户
+   */
   protected User user(RoutingContext ctx) {
     return (User) ctx.user();
   }
 
+  /**
+   * 获取会话id
+   *
+   * @param ctx 上下文
+   * @return sessionId
+   */
   protected String sessionId(RoutingContext ctx) {
     return user(ctx).getId().toString();
+  }
+
+  /**
+   * 请求有误
+   *
+   * @param ctx 上下文
+   */
+  protected void fail(RoutingContext ctx) {
+    ctx.fail(400);
   }
 }

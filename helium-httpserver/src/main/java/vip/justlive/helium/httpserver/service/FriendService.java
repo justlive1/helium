@@ -14,6 +14,7 @@
 package vip.justlive.helium.httpserver.service;
 
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.web.RoutingContext;
 import java.util.ArrayList;
@@ -23,9 +24,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vip.justlive.common.base.domain.Page;
+import vip.justlive.common.base.util.SnowflakeIdWorker;
+import vip.justlive.common.web.vertx.JustLive;
 import vip.justlive.common.web.vertx.datasource.JdbcPromise;
 import vip.justlive.common.web.vertx.datasource.ModelPromise;
 import vip.justlive.common.web.vertx.datasource.RepositoryFactory;
+import vip.justlive.helium.base.constant.AddressTemplate;
 import vip.justlive.helium.base.entity.Friend;
 import vip.justlive.helium.base.entity.Notify;
 import vip.justlive.helium.base.entity.Notify.STATUS;
@@ -67,7 +71,7 @@ public class FriendService extends BaseService {
    * @param ctx 上下文
    */
   public void mine(String sessionId, RoutingContext ctx) {
-    Session session = sessionManager.getSession(sessionId);
+    Session session = sessionManager.getSessionById(sessionId);
     if (session == null) {
       ctx.fail(403);
     } else {
@@ -125,6 +129,7 @@ public class FriendService extends BaseService {
    */
   public void addFriend(Long from, Long to, Long groupId, String remark, RoutingContext ctx) {
     Notify notify = new Notify();
+    notify.setId(SnowflakeIdWorker.defaultNextId());
     notify.setType(TYPE.FRIEND.value());
     notify.setFromId(from);
     notify.setToId(to);
@@ -133,9 +138,8 @@ public class FriendService extends BaseService {
     notify.setStatus(STATUS.PENDING.value());
     notify.setBelongTo(to);
     notify.setUnread(1);
-    notifyRepository.save(notify).succeeded(r -> success("申请已发送", ctx)).succeeded(r -> {
-      // 在线通知 TODO
-    }).failed(r -> error("添加好友失败", ctx));
+    notifyRepository.save(notify).succeeded(r -> success("申请已发送", ctx))
+      .succeeded(r -> sendNotify(to, notify.getId())).failed(r -> error("添加好友失败", ctx));
   }
 
   /**
@@ -182,20 +186,24 @@ public class FriendService extends BaseService {
       } else {
         // to 添加 from
         Friend friend = new Friend();
+        friend.setId(SnowflakeIdWorker.defaultNextId());
         friend.setFriendGroupId(groupId);
         friend.setFriendUserId(notify.getFromId());
         friend.setUserId(notify.getToId());
         friendRepository.save(friend).failed(r -> fail(ctx)).succeeded(r -> {
           // from 添加 to
+          friend.setId(SnowflakeIdWorker.defaultNextId());
           friend.setUserId(notify.getFromId());
           friend.setFriendUserId(notify.getToId());
           friend.setFriendGroupId(notify.getGroupId());
           friendRepository.save(friend)
             .succeeded(rs -> notifyRepository.updateNotifyStatus(id, STATUS.PASSED.value())
               .succeeded(ur -> {
-                // 在线通知 TODO
-                success(ctx);
-              }))
+                Notify agreeNotify = replyNotify(notify);
+                agreeNotify.setStatus(STATUS.PASSED.value());
+                notifyRepository.save(agreeNotify)
+                  .succeeded(rst -> sendNotify(notify.getFromId(), agreeNotify.getId()));
+              }).succeeded(ur -> success(ctx)))
             .failed(rs -> fail(ctx));
         });
       }
@@ -218,17 +226,10 @@ public class FriendService extends BaseService {
       notifyRepository.updateNotifyStatus(id, STATUS.REFUSED.value()).failed(r -> fail(ctx))
         .succeeded(r -> {
           //记录拒绝通知
-          Notify refuseNotify = new Notify();
-          refuseNotify.setUnread(1);
-          refuseNotify.setBelongTo(notify.getFromId());
+          Notify refuseNotify = replyNotify(notify);
           refuseNotify.setStatus(STATUS.REFUSED.value());
-          refuseNotify.setExpire(0);
-          refuseNotify.setGroupId(notify.getGroupId());
-          refuseNotify.setType(TYPE.SYSTEM.value());
-          refuseNotify.setFromId(notify.getToId());
-          refuseNotify.setToId(notify.getFromId());
-          notifyRepository.save(refuseNotify);
-          // 在线需要发送通知 TODO
+          notifyRepository.save(refuseNotify)
+            .succeeded(rs -> sendNotify(notify.getFromId(), refuseNotify.getId()));
           success(ctx);
         });
     }).failed(r -> fail(ctx));
@@ -300,17 +301,43 @@ public class FriendService extends BaseService {
 
   private MineNotify convertToMineNotify(JsonArray jsonArray) {
     MineNotify notify = new MineNotify();
-    notify.setId(jsonArray.getLong(0));
+    notify.setId(jsonArray.getLong(0).toString());
     notify.setType(jsonArray.getInteger(1));
     notify.setStatus(jsonArray.getInteger(2));
     notify.setRemark(jsonArray.getString(3));
     notify.setCreateAt(jsonArray.getString(4));
+    notify.setGroupId(jsonArray.getLong(5).toString());
     Mine mine = new Mine();
-    mine.setId(jsonArray.getLong(5).toString());
-    mine.setUsername(jsonArray.getString(6));
-    mine.setNickname(jsonArray.getString(7));
-    mine.setAvatar(jsonArray.getString(8));
+    mine.setId(jsonArray.getLong(6).toString());
+    mine.setUsername(jsonArray.getString(7));
+    mine.setNickname(jsonArray.getString(8));
+    mine.setAvatar(jsonArray.getString(9));
     notify.setFrom(mine);
     return notify;
+  }
+
+  private void sendNotify(Long userId, Long notifyId) {
+    Session session = sessionManager.getSessionById(userId.toString());
+    if (session != null && session.isActive()) {
+      notifyRepository.findMineNotifyById(notifyId).succeeded(jsonArray -> {
+        MineNotify mineNotify = convertToMineNotify(jsonArray);
+        JustLive.vertx().eventBus()
+          .send(AddressTemplate.NOTIFY_SERVER_TO_USER.value().concat(userId.toString()),
+            JsonObject.mapFrom(mineNotify));
+      });
+    }
+  }
+
+  private Notify replyNotify(Notify notify) {
+    Notify replyNotify = new Notify();
+    replyNotify.setId(SnowflakeIdWorker.defaultNextId());
+    replyNotify.setUnread(1);
+    replyNotify.setBelongTo(notify.getFromId());
+    replyNotify.setExpire(0);
+    replyNotify.setGroupId(notify.getGroupId());
+    replyNotify.setType(TYPE.SYSTEM.value());
+    replyNotify.setFromId(notify.getToId());
+    replyNotify.setToId(notify.getFromId());
+    return replyNotify;
   }
 }

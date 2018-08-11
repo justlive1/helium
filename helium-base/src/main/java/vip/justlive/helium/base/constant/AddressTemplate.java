@@ -11,30 +11,36 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package vip.justlive.helium.httpserver.vo;
-
-import lombok.Data;
+package vip.justlive.helium.base.constant;
 
 /**
- * 我的通知
+ * 地址模板
  *
  * @author wubo
  */
-@Data
-public class MineNotify {
+public enum AddressTemplate {
 
-  private String id;
+  /**
+   * 用户向服务器发送通知
+   */
+  USER_TO_SERVER("im.server"),
+  /**
+   * 用户私聊
+   */
+  MSG_USER_TO_USER("im.user."),
+  /**
+   * 服务器向用户发送通知
+   */
+  NOTIFY_SERVER_TO_USER("im.notify.user.");
 
-  private Integer type;
+  private String address;
 
-  private Mine from;
+  AddressTemplate(String address) {
+    this.address = address;
+  }
 
-  private String groupId;
-
-  private Integer status;
-
-  private String remark;
-
-  private String createAt;
+  public String value() {
+    return address;
+  }
 
 }

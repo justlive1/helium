@@ -14,19 +14,14 @@
 package vip.justlive.helium.httpserver.service;
 
 import com.google.common.collect.ImmutableMap;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.jwt.JWTAuth;
-import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.web.RoutingContext;
 import vip.justlive.common.base.crypto.Encoder;
 import vip.justlive.common.base.crypto.Md5Encoder;
-import vip.justlive.common.base.support.ConfigFactory;
+import vip.justlive.common.base.util.SnowflakeIdWorker;
 import vip.justlive.common.web.vertx.datasource.ModelsPromise;
 import vip.justlive.common.web.vertx.datasource.RepositoryFactory;
-import vip.justlive.helium.base.config.AuthConf;
 import vip.justlive.helium.base.entity.FriendGroup;
 import vip.justlive.helium.base.entity.User;
-import vip.justlive.helium.base.factory.AuthFactory;
 import vip.justlive.helium.base.repository.FriendGroupRepository;
 import vip.justlive.helium.base.repository.UserRepository;
 import vip.justlive.helium.base.session.SessionManager;
@@ -41,14 +36,12 @@ public class UserService extends BaseService {
 
   private final UserRepository userRepository;
   private final FriendGroupRepository friendGroupRepository;
-  private final JWTAuth jwtAuth;
   private final SessionManager sessionManager;
   private final Encoder encoder;
 
   public UserService() {
     this.userRepository = RepositoryFactory.repository(UserRepository.class);
     this.friendGroupRepository = RepositoryFactory.repository(FriendGroupRepository.class);
-    this.jwtAuth = AuthFactory.jwtAuth();
     this.sessionManager = new SessionManagerImpl();
     this.encoder = new Md5Encoder();
   }
@@ -68,16 +61,18 @@ public class UserService extends BaseService {
     modelsPromise.then(users -> {
       if (users == null || users.isEmpty()) {
         String raw = encoder.encode(password);
+        model.setId(SnowflakeIdWorker.defaultNextId());
         model.setPassword(raw);
         model.setNickname(model.getUsername());
         model.setAvatar("/static/image/avatar.jpg");
-        userRepository.save(model).succeeded(r -> userRepository.findByModel(model).then(u -> {
+        userRepository.save(model).failed(r -> fail(ctx)).succeeded(r -> {
           FriendGroup group = new FriendGroup();
+          group.setId(SnowflakeIdWorker.defaultNextId());
           group.setName("我的好友");
           group.setOrderIndex(0);
-          group.setUserId(u.get(0).getId());
+          group.setUserId(model.getId());
           friendGroupRepository.save(group);
-        }).then(rs -> success(ctx)));
+        }).succeeded(rs -> success(ctx));
       } else {
         error("用户名已被注册", ctx);
       }
@@ -96,24 +91,15 @@ public class UserService extends BaseService {
     model.setUsername(username);
     userRepository.findByModel(model).then(result -> {
       if (result == null || result.isEmpty()) {
-        ctx.fail(403);
+        ctx.fail(401);
       } else {
         User user = result.get(0);
         if (encoder.match(password, user.getPassword())) {
           ctx.setUser(user);
-          JWTOptions jwtOptions = new JWTOptions();
-          AuthConf authConf = ConfigFactory.load(AuthConf.class);
-          if (authConf.getJwtKeystoreAlgorithm() != null
-            && authConf.getJwtKeystoreAlgorithm().length() > 0) {
-            jwtOptions.setAlgorithm(authConf.getJwtKeystoreAlgorithm());
-          }
-          String token = jwtAuth.generateToken(
-            new JsonObject().put("username", user.getUsername()).put("uid", user.getId()),
-            jwtOptions);
-          sessionManager.create(user, token);
-          success(ImmutableMap.of("token", token, "uid", user.getId()), ctx);
+          String token = sessionManager.create(user).getToken();
+          success(ImmutableMap.of("token", token, "uid", user.getId().toString()), ctx);
         } else {
-          ctx.fail(403);
+          ctx.fail(401);
         }
       }
     });

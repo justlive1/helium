@@ -14,6 +14,7 @@
 package vip.justlive.helium.httpserver.session;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import vip.justlive.helium.base.entity.User;
@@ -27,27 +28,37 @@ import vip.justlive.helium.base.session.SessionManager;
  */
 public class SessionManagerImpl implements SessionManager {
 
-  private static final ConcurrentMap<String, Session> SESSIONS = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<String, Session> SESSIONIDS = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<String, Session> SESSIONTOKENS = new ConcurrentHashMap<>();
 
   @Override
-  public Session create(User user, String token) {
+  public Session create(User user) {
     Session session = new EventBusSession();
     session.setId(user.getId().toString());
     session.setUsername(user.getUsername());
     session.setUserId(user.getId());
-    session.setToken(token);
+    session.setToken(UUID.randomUUID().toString());
     session.setLoginAt(ZonedDateTime.now());
-    SESSIONS.put(session.getId(), session);
+    SESSIONIDS.put(session.getId(), session);
+    SESSIONTOKENS.put(session.getToken(), session);
     return session;
   }
 
   @Override
-  public Session getSession(String sessionId) {
-    return SESSIONS.get(sessionId);
+  public Session getSessionById(String sessionId) {
+    return SESSIONIDS.get(sessionId);
+  }
+
+  @Override
+  public Session getSessionByToken(String token) {
+    return SESSIONTOKENS.get(token);
   }
 
   @Override
   public void remove(String sessionId) {
-    SESSIONS.remove(sessionId);
+    Session session = SESSIONIDS.remove(sessionId);
+    if (session != null) {
+      SESSIONTOKENS.remove(session.getToken());
+    }
   }
 }
