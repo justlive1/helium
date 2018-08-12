@@ -209,6 +209,7 @@ layui.define(['jquery', 'layer', 'layim'], function (exports) {
       if (data.body.status === 1) {
         var friend = data.body.from;
         friend.groupid = data.body.groupId;
+        friend.type= 'friend';
         layui.layim.addList(friend);
       }
     },

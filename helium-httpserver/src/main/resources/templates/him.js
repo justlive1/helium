@@ -77,7 +77,7 @@
       this.close();
       var eb = new EventBus(_url + "?_token=" + _token, {
         vertxbus_ping_interval: 5000,
-        vertxbus_reconnect_attempts_max: Infinity,
+        vertxbus_reconnect_attempts_max: 10,
         vertxbus_reconnect_delay_min: 1000,
         vertxbus_reconnect_delay_max: 5000,
         vertxbus_reconnect_exponent: 2,
@@ -123,7 +123,8 @@
       };
 
       eb.onclose = function (err) {
-        if (_this.closedHander && typeof _this.closedHander === 'function') {
+        if (eb.reconnectAttempts >= eb.maxReconnectAttempts
+          && _this.closedHander && typeof _this.closedHander === 'function') {
           _this.closedHander.call(window, err);
         } else {
           console.log(err);

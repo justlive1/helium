@@ -33,6 +33,7 @@ layui.define(['layim', 'layer', 'flow', 'util'], function (exports) {
             layui.laytpl(tpl).render({notifies: resp.data}, function (html) {
               layui.$("#msgbox-view").html(html);
             });
+            parent.layui.layim.cache().msgbox = 0;
           } else {
             layui.layer.msg(resp.message);
           }

@@ -29,8 +29,9 @@
 
   <!--<logger name="io.netty" level="warn"/>-->
   <!--<logger name="io.vertx" level="info"/>-->
-  <logger name="io.netty.handler.codec.http.websocketx" level="error" />
+  <logger name="io.netty.handler.codec.http.websocketx" level="error"/>
   <logger name="com.zaxxer.hikari" level="warn"/>
+  <logger name="io.vertx.ext.web.handler.impl.SessionHandlerImpl" level="error"/>
 
   <root level="debug">
     <appender-ref ref="STDOUT"/>
