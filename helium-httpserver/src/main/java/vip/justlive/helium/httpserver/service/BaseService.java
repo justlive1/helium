@@ -17,6 +17,7 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import lombok.extern.slf4j.Slf4j;
 import vip.justlive.common.base.domain.Response;
 
 /**
@@ -24,6 +25,7 @@ import vip.justlive.common.base.domain.Response;
  *
  * @author wubo
  */
+@Slf4j
 public class BaseService {
 
   /**
@@ -73,9 +75,13 @@ public class BaseService {
   /**
    * 服务器错误
    *
+   * @param cause 异常
    * @param ctx 上下文
    */
-  public void fail(RoutingContext ctx) {
+  public void fail(Throwable cause, RoutingContext ctx) {
+    if (cause != null) {
+      log.error("service error ", cause);
+    }
     ctx.fail(500);
   }
 

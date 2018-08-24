@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -11,38 +11,22 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package vip.justlive.helium.httpserver.session;
-
-import vip.justlive.helium.base.session.Session;
+package vip.justlive.helium.base.service;
 
 /**
- * 基于EventBus的Session
+ * 文件保存接口
  *
  * @author wubo
  */
-public class EventBusSession extends Session {
+public interface FileStorage {
 
-  private static final long serialVersionUID = 1L;
+  /**
+   * 保存
+   *
+   * @param bytes 数据
+   * @param suffix 后缀名
+   * @return 保存地址
+   */
+  String store(byte[] bytes, String suffix);
 
-  private volatile boolean active = true;
-
-  @Override
-  public boolean isActive() {
-    return active;
-  }
-
-  @Override
-  public boolean write(Object msg) {
-    return false;
-  }
-
-  @Override
-  public void login() {
-    active = true;
-  }
-
-  @Override
-  public void logout() {
-    active = false;
-  }
 }

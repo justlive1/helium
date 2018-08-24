@@ -14,6 +14,7 @@
 package vip.justlive.helium.httpserver.controller;
 
 import io.vertx.ext.web.RoutingContext;
+import vip.justlive.common.base.annotation.Inject;
 import vip.justlive.common.web.vertx.annotation.VertxRequestParam;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
@@ -29,8 +30,9 @@ public class FriendController extends BaseController {
 
   private final FriendService friendService;
 
-  public FriendController() {
-    friendService = new FriendService();
+  @Inject
+  public FriendController(FriendService friendService) {
+    this.friendService = friendService;
   }
 
   /**
@@ -116,5 +118,65 @@ public class FriendController extends BaseController {
   @VertxRouteMapping("/refuseAddFriend")
   public void refuseAddFriend(@VertxRequestParam("id") Long id, RoutingContext ctx) {
     friendService.refuseAddFriend(id, ctx);
+  }
+
+  /**
+   * 添加好友分组
+   *
+   * @param name 分组名称
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/addFriendGroup")
+  public void addFriendGroup(@VertxRequestParam("name") String name, RoutingContext ctx) {
+    friendService.addFriendGroup(name, user(ctx).getId(), ctx);
+  }
+
+  /**
+   * 修改分组名称
+   *
+   * @param name 分组名称
+   * @param id 分组id
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/updateFriendGroupName")
+  public void updateFriendGroupName(@VertxRequestParam("name") String name,
+    @VertxRequestParam("id") Long id,
+    RoutingContext ctx) {
+    friendService.updateFriendGroupName(name, id, user(ctx).getId(), ctx);
+  }
+
+  /**
+   * 删除好友分组
+   *
+   * @param id 分组id
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/delFriendGroup")
+  public void delFriendGroup(@VertxRequestParam("id") Long id, RoutingContext ctx) {
+    friendService.delFriendGroup(id, user(ctx).getId(), ctx);
+  }
+
+  /**
+   * 删除好友
+   *
+   * @param id 好友id
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/delFriend")
+  public void delFriend(@VertxRequestParam("id") Long id, RoutingContext ctx) {
+    friendService.delFriend(user(ctx).getId(), id, ctx);
+  }
+
+  /**
+   * 修改好友备注
+   *
+   * @param memo 备注名
+   * @param friendId 好友id
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/updateFriendMemo")
+  public void updateFriendMemo(@VertxRequestParam("memo") String memo,
+    @VertxRequestParam("friendId") Long friendId, RoutingContext ctx) {
+    friendService.updateFriendMemo(user(ctx).getId(), friendId, memo, ctx);
   }
 }

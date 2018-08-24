@@ -61,7 +61,7 @@
     <div class="layui-col-xs3 layui-find-list">
       <li layim-event="add">
         <img src="{{ item.avatar }}">
-        <span>{{item.username}}({{item.nickname||item.username}})</span>
+        <span>{{item.username}}</span>
         <p> {{# if(item.sign == null){ }}这个人很懒，什么都没留下。{{# }else{ }}{{item.sign}} {{# } }} </p>
         <button class="layui-btn layui-btn-xs btncolor add" data-type="0"
                 data-avatar="{{item.avatar }}" data-uid="{{item.id}}" data-name="{{item.username}}">

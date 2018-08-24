@@ -1016,7 +1016,6 @@ layui.define(['jquery', 'layer'], function (exports) {
         var handle = Win10._handleReady[i];
         handle();
       }
-      Win10.Win10_parent = parent.Win10;
     }
 
   };

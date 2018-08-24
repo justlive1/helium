@@ -14,8 +14,8 @@
 package vip.justlive.helium.httpserver.controller;
 
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
-import org.thymeleaf.templatemode.TemplateMode;
+import vip.justlive.common.base.annotation.Inject;
+import vip.justlive.common.base.annotation.Named;
 import vip.justlive.common.base.support.ConfigFactory;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
@@ -34,10 +34,11 @@ public class IndexController {
   private final DelegateTemplateEngine htmlEngine;
   private final DelegateTemplateEngine jsEngine;
 
-  public IndexController() {
-    this.htmlEngine = DelegateTemplateEngine.create(ThymeleafTemplateEngine.create());
-    this.jsEngine = DelegateTemplateEngine.create(ThymeleafTemplateEngine.create().setMode(
-      TemplateMode.JAVASCRIPT));
+  @Inject
+  public IndexController(@Named("htmlEngine") DelegateTemplateEngine htmlEngine,
+    @Named("jsEngine") DelegateTemplateEngine jsEngine) {
+    this.htmlEngine = htmlEngine;
+    this.jsEngine = jsEngine;
   }
 
   /**
@@ -115,6 +116,11 @@ public class IndexController {
     ctx.put("notifyServerToUser", AddressTemplate.NOTIFY_SERVER_TO_USER.value());
     ctx.put("userToServer", AddressTemplate.USER_TO_SERVER.value());
     jsEngine.render(ctx, "/him.js");
+  }
+
+  @VertxRouteMapping("/avatar.html")
+  public void avatar(RoutingContext ctx) {
+    htmlEngine.render(ctx, "/avatar.html");
   }
 
 }

@@ -16,7 +16,9 @@ package vip.justlive.helium.httpserver.controller;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.commons.lang3.StringUtils;
+import vip.justlive.common.base.annotation.Inject;
 import vip.justlive.common.web.vertx.annotation.VertxRequestBody;
+import vip.justlive.common.web.vertx.annotation.VertxRequestParam;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
 import vip.justlive.helium.base.entity.User;
@@ -32,8 +34,9 @@ public class UserController extends BaseController {
 
   private final UserService userService;
 
-  public UserController() {
-    userService = new UserService();
+  @Inject
+  public UserController(UserService userService) {
+    this.userService = userService;
   }
 
   /**
@@ -64,5 +67,39 @@ public class UserController extends BaseController {
     } else {
       userService.login(user.getUsername(), user.getPassword(), ctx);
     }
+  }
+
+  /**
+   * 修改签名
+   *
+   * @param signature 签名
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/interface/user/updateSignature")
+  public void updateSignature(@VertxRequestParam("signature") String signature,
+    RoutingContext ctx) {
+    userService.updateSignature(user(ctx).getId(), signature, ctx);
+  }
+
+  /**
+   * 用户是否在线
+   *
+   * @param id 用户id
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/interface/user/online")
+  public void online(@VertxRequestParam("id") Long id, RoutingContext ctx) {
+    userService.online(user(ctx).getId(), id, ctx);
+  }
+
+  /**
+   * 修改头像
+   *
+   * @param img 图片
+   * @param ctx 上下文
+   */
+  @VertxRouteMapping("/interface/user/avatar")
+  public void avatar(@VertxRequestParam("img") String img, RoutingContext ctx) {
+    userService.avatar(user(ctx).getId(), img, ctx);
   }
 }

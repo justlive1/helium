@@ -1,0 +1,119 @@
+<!--
+  ~  Copyright (C) 2018 justlive1
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License
+  ~ is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+  ~ or implied. See the License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>修改头像</title>
+  <link href="https://cdn.bootcss.com/cropper/4.0.0/cropper.min.css" rel="stylesheet"/>
+  <link href="/static/css/him.css" rel="stylesheet">
+
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/cropper/4.0.0/cropper.min.js"></script>
+</head>
+<body>
+<div class="tailoring-container">
+  <div class="tailoring-content">
+    <div class="tailoring-content-one">
+      <label title="上传图片" for="chooseImg" class="l-btn choose-btn">
+        <input type="file" accept="image/jpg,image/jpeg,image/png" name="file" id="chooseImg"
+               class="hidden" onchange="selectImg(this)">
+        选择头像
+      </label>
+    </div>
+    <div class="tailoring-content-two">
+      <div class="tailoring-box-parcel">
+        <img id="tailoringImg">
+      </div>
+      <div class="preview-box-parcel">
+        <p>头像预览：</p>
+        <div class="square previewImg"></div>
+        <div class="circular previewImg"></div>
+      </div>
+    </div>
+    <div class="tailoring-content-three">
+      <button class="l-btn cropper-reset-btn">还原</button>
+      <button class="l-btn cropper-rotate-btn">旋转</button>
+      <button class="l-btn cropper-scaleX-btn">换向</button>
+      <button class="l-btn sureCut" id="sureCut">确定</button>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  function selectImg(file) {
+    if (!file.files || !file.files[0]) {
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (evt) {
+      $('#tailoringImg').cropper('replace', evt.target.result, false);
+    }
+    reader.readAsDataURL(file.files[0]);
+  }
+
+  $('#tailoringImg').cropper({
+    aspectRatio: 1 / 1,//默认比例
+    preview: '.previewImg',//预览视图
+    guides: false,  //裁剪框的虚线(九宫格)
+    autoCropArea: 0.5,  //0-1之间的数值，定义自动剪裁区域的大小，默认0.8
+    movable: false, //是否允许移动图片
+    dragCrop: true,  //是否允许移除当前的剪裁框，并通过拖动来新建一个剪裁框区域
+    movable: true,  //是否允许移动剪裁框
+    resizable: true,  //是否允许改变裁剪框的大小
+    zoomable: true,  //是否允许缩放图片大小
+    mouseWheelZoom: true,  //是否允许通过鼠标滚轮来缩放图片
+    touchDragZoom: true,  //是否允许通过触摸移动来缩放图片
+    rotatable: true  //是否允许旋转图片
+  });
+  //旋转
+  $(".cropper-rotate-btn").on("click", function () {
+    $('#tailoringImg').cropper("rotate", 45);
+  });
+  //复位
+  $(".cropper-reset-btn").on("click", function () {
+    $('#tailoringImg').cropper("reset");
+  });
+  //换向
+  var flagX = true;
+  $(".cropper-scaleX-btn").on("click", function () {
+    if (flagX) {
+      $('#tailoringImg').cropper("scaleX", -1);
+      flagX = false;
+    } else {
+      $('#tailoringImg').cropper("scaleX", 1);
+      flagX = true;
+    }
+    flagX != flagX;
+  });
+
+  //裁剪后的处理
+  $("#sureCut").on("click", function () {
+    if ($("#tailoringImg").attr("src") == null) {
+      return false;
+    } else {
+      var cas = $('#tailoringImg').cropper('getCroppedCanvas');
+      var base64url = cas.toDataURL('image/png');
+      $.post("/interface/user/avatar", {"img": base64url}, function (resp) {
+        if (resp.success) {
+          $(window.parent.document).find(".layui-layim-avatar-cicle").prop("src", base64url);
+          window.parent.layui.layer.close(window.parent.avatarIndex);
+        } else {
+          window.parent.layui.layer.msg(resp.message);
+        }
+      })
+    }
+  });
+</script>
+</body>
+</html>

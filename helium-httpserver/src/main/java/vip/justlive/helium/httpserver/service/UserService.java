@@ -15,35 +15,45 @@ package vip.justlive.helium.httpserver.service;
 
 import com.google.common.collect.ImmutableMap;
 import io.vertx.ext.web.RoutingContext;
+import vip.justlive.common.base.annotation.Inject;
+import vip.justlive.common.base.annotation.Singleton;
 import vip.justlive.common.base.crypto.Encoder;
-import vip.justlive.common.base.crypto.Md5Encoder;
 import vip.justlive.common.base.util.SnowflakeIdWorker;
 import vip.justlive.common.web.vertx.datasource.ModelsPromise;
-import vip.justlive.common.web.vertx.datasource.RepositoryFactory;
 import vip.justlive.helium.base.entity.FriendGroup;
 import vip.justlive.helium.base.entity.User;
+import vip.justlive.helium.base.repository.ChatLogRepository;
 import vip.justlive.helium.base.repository.FriendGroupRepository;
 import vip.justlive.helium.base.repository.UserRepository;
+import vip.justlive.helium.base.service.UploadService;
 import vip.justlive.helium.base.session.SessionManager;
-import vip.justlive.helium.httpserver.session.SessionManagerImpl;
+import vip.justlive.helium.httpserver.vo.Mine;
 
 /**
  * 认证服务，包含注册和登录
  *
  * @author wubo
  */
+@Singleton
 public class UserService extends BaseService {
 
   private final UserRepository userRepository;
   private final FriendGroupRepository friendGroupRepository;
+  private final ChatLogRepository chatLogRepository;
   private final SessionManager sessionManager;
   private final Encoder encoder;
+  private final UploadService uploadService;
 
-  public UserService() {
-    this.userRepository = RepositoryFactory.repository(UserRepository.class);
-    this.friendGroupRepository = RepositoryFactory.repository(FriendGroupRepository.class);
-    this.sessionManager = new SessionManagerImpl();
-    this.encoder = new Md5Encoder();
+  @Inject
+  public UserService(UserRepository userRepository, FriendGroupRepository friendGroupRepository,
+    ChatLogRepository chatLogRepository, SessionManager sessionManager, Encoder encoder,
+    UploadService uploadService) {
+    this.userRepository = userRepository;
+    this.friendGroupRepository = friendGroupRepository;
+    this.chatLogRepository = chatLogRepository;
+    this.sessionManager = sessionManager;
+    this.encoder = encoder;
+    this.uploadService = uploadService;
   }
 
   /**
@@ -63,9 +73,8 @@ public class UserService extends BaseService {
         String raw = encoder.encode(password);
         model.setId(SnowflakeIdWorker.defaultNextId());
         model.setPassword(raw);
-        model.setNickname(model.getUsername());
         model.setAvatar("/static/image/avatar.jpg");
-        userRepository.save(model).failed(r -> fail(ctx)).succeeded(r -> {
+        userRepository.save(model).failed(r -> fail(r, ctx)).succeeded(r -> {
           FriendGroup group = new FriendGroup();
           group.setId(SnowflakeIdWorker.defaultNextId());
           group.setName("我的好友");
@@ -105,5 +114,41 @@ public class UserService extends BaseService {
     });
   }
 
+  /**
+   * 修改签名
+   *
+   * @param userId 用户id
+   * @param signature 签名
+   */
+  public void updateSignature(long userId, String signature, RoutingContext ctx) {
+    User user = new User();
+    user.setId(userId);
+    user.setSignature(signature);
+    userRepository.update(user).failed(r -> fail(r, ctx)).succeeded(r -> success(ctx));
+  }
 
+  public void online(long userId, long friendId, RoutingContext ctx) {
+    chatLogRepository.updateReadByFriendId(userId, friendId);
+    userRepository.findById(friendId).then(user -> {
+      Mine mine = new Mine();
+      mine.setId(user.getId().toString());
+      mine.setAvatar(user.getAvatar());
+      mine.setSign(user.getSignature());
+      if (sessionManager.isOnline(friendId)) {
+        mine.setStatus(Mine.ONLINE);
+      } else {
+        mine.setStatus(Mine.OFFLINE);
+      }
+      success(mine, ctx);
+    }).failed(r -> fail(r, ctx));
+  }
+
+  public void avatar(long userId, String img, RoutingContext ctx) {
+    String url = uploadService.uploadBase64Png(img);
+    User user = new User();
+    user.setId(userId);
+    user.setAvatar(url);
+    userRepository.update(user).failed(r -> fail(r, ctx))
+      .succeeded(r -> success(url, ctx));
+  }
 }

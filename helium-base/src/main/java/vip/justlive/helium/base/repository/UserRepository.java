@@ -13,6 +13,7 @@
  */
 package vip.justlive.helium.base.repository;
 
+import vip.justlive.common.base.annotation.Singleton;
 import vip.justlive.common.web.vertx.datasource.Repository;
 import vip.justlive.helium.base.entity.User;
 
@@ -21,6 +22,7 @@ import vip.justlive.helium.base.entity.User;
  *
  * @author wubo
  */
+@Singleton
 public class UserRepository extends Repository<User> {
 
 }

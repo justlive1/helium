@@ -34,6 +34,9 @@ public class Friend implements Serializable {
   @Column
   private Long id;
 
+  @Column(name = "meno_name")
+  private String memoName;
+
   @Column(name = "user_id")
   private Long userId;
 

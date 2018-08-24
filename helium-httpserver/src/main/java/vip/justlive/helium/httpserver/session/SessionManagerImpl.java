@@ -13,10 +13,13 @@
  */
 package vip.justlive.helium.httpserver.session;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import io.vertx.ext.web.handler.SessionHandler;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import vip.justlive.common.base.annotation.Singleton;
 import vip.justlive.helium.base.entity.User;
 import vip.justlive.helium.base.session.Session;
 import vip.justlive.helium.base.session.SessionManager;
@@ -26,10 +29,13 @@ import vip.justlive.helium.base.session.SessionManager;
  *
  * @author wubo
  */
+@Singleton
 public class SessionManagerImpl implements SessionManager {
 
-  private static final ConcurrentMap<String, Session> SESSIONIDS = new ConcurrentHashMap<>();
-  private static final ConcurrentMap<String, Session> SESSIONTOKENS = new ConcurrentHashMap<>();
+  private static final Cache<String, Session> SESSIONIDS = CacheBuilder.newBuilder()
+    .expireAfterAccess(SessionHandler.DEFAULT_SESSION_TIMEOUT, TimeUnit.MILLISECONDS).build();
+  private static final Cache<String, Session> SESSIONTOKENS = CacheBuilder.newBuilder()
+    .expireAfterAccess(SessionHandler.DEFAULT_SESSION_TIMEOUT, TimeUnit.MILLISECONDS).build();
 
   @Override
   public Session create(User user) {
@@ -46,19 +52,42 @@ public class SessionManagerImpl implements SessionManager {
 
   @Override
   public Session getSessionById(String sessionId) {
-    return SESSIONIDS.get(sessionId);
+    return SESSIONIDS.getIfPresent(sessionId);
   }
 
   @Override
   public Session getSessionByToken(String token) {
-    return SESSIONTOKENS.get(token);
+    return SESSIONTOKENS.getIfPresent(token);
   }
 
   @Override
   public void remove(String sessionId) {
-    Session session = SESSIONIDS.remove(sessionId);
+    Session session = SESSIONIDS.getIfPresent(sessionId);
     if (session != null) {
-      SESSIONTOKENS.remove(session.getToken());
+      SESSIONIDS.invalidate(sessionId);
+      SESSIONTOKENS.invalidate(session.getToken());
+    }
+  }
+
+  @Override
+  public boolean isOnline(Long userId) {
+    Session session = SESSIONIDS.getIfPresent(userId.toString());
+    return session != null && session.isActive();
+  }
+
+  @Override
+  public void login(Long userId) {
+    Session session = SESSIONIDS.getIfPresent(userId.toString());
+    if (session != null) {
+      session.login();
+    }
+  }
+
+  @Override
+  public void logout(Long userId) {
+    Session session = SESSIONIDS.getIfPresent(userId.toString());
+    if (session != null) {
+      session.logout();
     }
   }
 }

@@ -67,13 +67,17 @@ layui.define(['layim', 'layer', 'flow', 'util'], function (exports) {
                 success: function (resp) {
                   if (resp.success) {
                     //将好友追加到主面板
+                    var friend = data.from;
+                    friend.groupid = group;
+                    parent.layui.$(parent.window.document.body).data(
+                      "friends")[friend.id] = friend;
                     parent.layui.layim.addList({
                       type: 'friend',
-                      avatar: data.from.avatar,
-                      username: data.from.username,
+                      avatar: friend.avatar,
+                      username: friend.username,
                       groupid: group,
-                      id: data.from.id,
-                      sign: data.from.sign
+                      id: friend.id,
+                      sign: friend.sign
                     });
                     parent.layer.close(index);
                     _this.parent().html("已同意");

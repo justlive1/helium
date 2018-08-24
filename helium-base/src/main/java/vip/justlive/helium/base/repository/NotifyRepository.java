@@ -16,6 +16,7 @@ package vip.justlive.helium.base.repository;
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.UpdateResult;
+import vip.justlive.common.base.annotation.Singleton;
 import vip.justlive.common.web.vertx.datasource.JdbcPromise;
 import vip.justlive.common.web.vertx.datasource.Repository;
 import vip.justlive.helium.base.entity.Notify;
@@ -25,6 +26,7 @@ import vip.justlive.helium.base.entity.Notify;
  *
  * @author wubo
  */
+@Singleton
 public class NotifyRepository extends Repository<Notify> {
 
   /**
@@ -50,8 +52,8 @@ public class NotifyRepository extends Repository<Notify> {
   public JdbcPromise<ResultSet> findMineNotifies(Long userId) {
     JdbcPromise<ResultSet> promise = new JdbcPromise<>();
     jdbcClient().queryWithParams(
-      "select n.id, n.type, n.status, n.remark, n.create_at, n.group_id, u.id as user_id, u.username, u.nickname, u.avatar"
-        + " from notify n left join user u on n.from_id = u.id where n.belong_to = ?",
+      "select n.id, n.type, n.status, n.remark, n.create_at, n.group_id, u.id as user_id, u.username, u.avatar"
+        + " from notify n left join user u on n.from_id = u.id where n.belong_to = ? order by n.create_at desc",
       new JsonArray().add(userId), promise);
     return promise;
   }
@@ -59,7 +61,7 @@ public class NotifyRepository extends Repository<Notify> {
   public JdbcPromise<JsonArray> findMineNotifyById(Long id) {
     JdbcPromise<JsonArray> promise = new JdbcPromise<>();
     jdbcClient().querySingleWithParams(
-      "select n.id, n.type, n.status, n.remark, n.create_at, n.group_id, u.id as user_id, u.username, u.nickname, u.avatar"
+      "select n.id, n.type, n.status, n.remark, n.create_at, n.group_id, u.id as user_id, u.username, u.avatar"
         + " from notify n left join user u on n.from_id = u.id where n.id = ?",
       new JsonArray().add(id), promise);
     return promise;
@@ -91,4 +93,5 @@ public class NotifyRepository extends Repository<Notify> {
       new JsonArray().add(status).add(id), promise);
     return promise;
   }
+
 }

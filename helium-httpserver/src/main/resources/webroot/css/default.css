@@ -18,18 +18,6 @@
   MingLiu
 }
 
-.layui-layim, .layui-layim-min {
-  padding-bottom: 40px !important;
-}
-
-.layui-layim-min {
-  border: 0 !important;
-}
-
-.layui-layim-info .layui-layim-status {
-  line-height: 15px;
-}
-
 /*磁贴自定义样式*/
 .win10-block-content-text {
   line-height: 44px;

@@ -13,6 +13,10 @@
  */
 package vip.justlive.helium.base.repository;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.ext.sql.UpdateResult;
+import vip.justlive.common.base.annotation.Singleton;
+import vip.justlive.common.web.vertx.datasource.JdbcPromise;
 import vip.justlive.common.web.vertx.datasource.Repository;
 import vip.justlive.helium.base.entity.FriendGroup;
 
@@ -21,6 +25,20 @@ import vip.justlive.helium.base.entity.FriendGroup;
  *
  * @author wubo
  */
+@Singleton
 public class FriendGroupRepository extends Repository<FriendGroup> {
 
+  public JdbcPromise<UpdateResult> updateGroupName(String name, Long id) {
+    JdbcPromise<UpdateResult> promise = new JdbcPromise<>();
+    jdbcClient().updateWithParams("update friend_group set name = ? where id = ? ",
+      new JsonArray().add(name).add(id), promise);
+    return promise;
+  }
+
+  public JdbcPromise<UpdateResult> deleteGroup(Long id) {
+    JdbcPromise<UpdateResult> promise = new JdbcPromise<>();
+    jdbcClient()
+      .updateWithParams("delete from friend_group where id = ? ", new JsonArray().add(id), promise);
+    return promise;
+  }
 }

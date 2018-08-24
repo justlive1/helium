@@ -59,6 +59,10 @@
       this.closedHander = callback;
     };
 
+    this.addOfflineMsgHandler = function (callback) {
+      this.offlineMsgHandler = callback;
+    };
+
     this.init = function () {
       if (this.validate()) {
         this._createEventBus();
@@ -111,7 +115,7 @@
             }
           });
         _this.eventBus = eb;
-        _this.sendToServer('M_200');
+        _this.sendToServer('M_200', {}, _this.offlineMsgHandler);
       };
 
       eb.onerror = function (err) {

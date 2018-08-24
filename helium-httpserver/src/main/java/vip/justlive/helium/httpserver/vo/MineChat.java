@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 justlive1
+ *  Copyright (C) 2018 justlive1
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -11,38 +11,29 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package vip.justlive.helium.httpserver.session;
+package vip.justlive.helium.httpserver.vo;
 
-import vip.justlive.helium.base.session.Session;
+import lombok.Data;
 
 /**
- * 基于EventBus的Session
+ * 我的聊天
  *
  * @author wubo
  */
-public class EventBusSession extends Session {
+@Data
+public class MineChat {
 
-  private static final long serialVersionUID = 1L;
+  private String id;
 
-  private volatile boolean active = true;
+  private String fromId;
 
-  @Override
-  public boolean isActive() {
-    return active;
-  }
+  private String toId;
 
-  @Override
-  public boolean write(Object msg) {
-    return false;
-  }
+  private Integer type;
 
-  @Override
-  public void login() {
-    active = true;
-  }
+  private String content;
 
-  @Override
-  public void logout() {
-    active = false;
-  }
+  private Integer status;
+
+  private Long timestamp;
 }

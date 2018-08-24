@@ -23,24 +23,27 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import vip.justlive.common.base.annotation.Inject;
+import vip.justlive.common.base.annotation.Singleton;
 import vip.justlive.common.base.domain.Page;
 import vip.justlive.common.base.util.SnowflakeIdWorker;
 import vip.justlive.common.web.vertx.JustLive;
 import vip.justlive.common.web.vertx.datasource.JdbcPromise;
 import vip.justlive.common.web.vertx.datasource.ModelPromise;
-import vip.justlive.common.web.vertx.datasource.RepositoryFactory;
 import vip.justlive.helium.base.constant.AddressTemplate;
 import vip.justlive.helium.base.entity.Friend;
+import vip.justlive.helium.base.entity.FriendGroup;
 import vip.justlive.helium.base.entity.Notify;
 import vip.justlive.helium.base.entity.Notify.STATUS;
 import vip.justlive.helium.base.entity.Notify.TYPE;
 import vip.justlive.helium.base.entity.User;
+import vip.justlive.helium.base.repository.FriendGroupRepository;
 import vip.justlive.helium.base.repository.FriendRepository;
 import vip.justlive.helium.base.repository.NotifyRepository;
 import vip.justlive.helium.base.repository.UserRepository;
 import vip.justlive.helium.base.session.Session;
 import vip.justlive.helium.base.session.SessionManager;
-import vip.justlive.helium.httpserver.session.SessionManagerImpl;
 import vip.justlive.helium.httpserver.vo.Mine;
 import vip.justlive.helium.httpserver.vo.MineFriend;
 import vip.justlive.helium.httpserver.vo.MineNotify;
@@ -50,18 +53,24 @@ import vip.justlive.helium.httpserver.vo.MineNotify;
  *
  * @author wubo
  */
+@Singleton
 public class FriendService extends BaseService {
 
   private final UserRepository userRepository;
   private final FriendRepository friendRepository;
   private final NotifyRepository notifyRepository;
+  private final FriendGroupRepository friendGroupRepository;
   private final SessionManager sessionManager;
 
-  public FriendService() {
-    userRepository = RepositoryFactory.repository(UserRepository.class);
-    friendRepository = RepositoryFactory.repository(FriendRepository.class);
-    notifyRepository = RepositoryFactory.repository(NotifyRepository.class);
-    sessionManager = new SessionManagerImpl();
+  @Inject
+  public FriendService(UserRepository userRepository, FriendRepository friendRepository,
+    NotifyRepository notifyRepository, FriendGroupRepository friendGroupRepository,
+    SessionManager sessionManager) {
+    this.userRepository = userRepository;
+    this.friendRepository = friendRepository;
+    this.notifyRepository = notifyRepository;
+    this.friendGroupRepository = friendGroupRepository;
+    this.sessionManager = sessionManager;
   }
 
   /**
@@ -113,9 +122,9 @@ public class FriendService extends BaseService {
             list.forEach(jsonArray -> friends.add(convertToMine(jsonArray)));
           }
           success(new Page<>(pageIndex, pageSize, total, friends), ctx);
-        }).failed(rs -> fail(ctx));
+        }).failed(rs -> fail(rs, ctx));
       }
-    }).failed(r -> fail(ctx));
+    }).failed(r -> fail(r, ctx));
   }
 
   /**
@@ -152,7 +161,7 @@ public class FriendService extends BaseService {
     notifyRepository.countUnreadNotifies(userId).succeeded(r -> {
       long total = r.getLong(0);
       success(total, ctx);
-    }).failed(r -> fail(ctx));
+    }).failed(r -> fail(r, ctx));
   }
 
   /**
@@ -162,7 +171,7 @@ public class FriendService extends BaseService {
    * @param ctx 上下文
    */
   public void findMineNotifies(Long userId, RoutingContext ctx) {
-    notifyRepository.findMineNotifies(userId).failed(r -> fail(ctx)).succeeded(rs -> {
+    notifyRepository.findMineNotifies(userId).failed(r -> fail(r, ctx)).succeeded(rs -> {
       List<JsonArray> list = rs.getResults();
       List<MineNotify> result = new ArrayList<>(10);
       if (list != null && !list.isEmpty()) {
@@ -182,7 +191,7 @@ public class FriendService extends BaseService {
   public void agreeAddFriend(Long id, Long groupId, RoutingContext ctx) {
     notifyRepository.findById(id).then(notify -> {
       if (notify == null || notify.getStatus() != STATUS.PENDING.value()) {
-        fail(ctx);
+        fail(null, ctx);
       } else {
         // to 添加 from
         Friend friend = new Friend();
@@ -190,24 +199,22 @@ public class FriendService extends BaseService {
         friend.setFriendGroupId(groupId);
         friend.setFriendUserId(notify.getFromId());
         friend.setUserId(notify.getToId());
-        friendRepository.save(friend).failed(r -> fail(ctx)).succeeded(r -> {
+        friendRepository.save(friend).failed(r -> fail(r, ctx)).succeeded(r -> {
           // from 添加 to
           friend.setId(SnowflakeIdWorker.defaultNextId());
           friend.setUserId(notify.getFromId());
           friend.setFriendUserId(notify.getToId());
           friend.setFriendGroupId(notify.getGroupId());
-          friendRepository.save(friend)
-            .succeeded(rs -> notifyRepository.updateNotifyStatus(id, STATUS.PASSED.value())
-              .succeeded(ur -> {
-                Notify agreeNotify = replyNotify(notify);
-                agreeNotify.setStatus(STATUS.PASSED.value());
-                notifyRepository.save(agreeNotify)
-                  .succeeded(rst -> sendNotify(notify.getFromId(), agreeNotify.getId()));
-              }).succeeded(ur -> success(ctx)))
-            .failed(rs -> fail(ctx));
+          friendRepository.save(friend).succeeded(
+            rs -> notifyRepository.updateNotifyStatus(id, STATUS.PASSED.value()).succeeded(ur -> {
+              Notify agreeNotify = replyNotify(notify);
+              agreeNotify.setStatus(STATUS.PASSED.value());
+              notifyRepository.save(agreeNotify)
+                .succeeded(rst -> sendNotify(notify.getFromId(), agreeNotify.getId()));
+            }).succeeded(ur -> success(ctx))).failed(rs -> fail(rs, ctx));
         });
       }
-    }).failed(r -> fail(ctx));
+    }).failed(r -> fail(r, ctx));
   }
 
   /**
@@ -219,11 +226,11 @@ public class FriendService extends BaseService {
   public void refuseAddFriend(Long id, RoutingContext ctx) {
     notifyRepository.findById(id).then(notify -> {
       if (notify.getStatus() != STATUS.PENDING.value()) {
-        fail(ctx);
+        fail(null, ctx);
         return;
       }
       //修改状态
-      notifyRepository.updateNotifyStatus(id, STATUS.REFUSED.value()).failed(r -> fail(ctx))
+      notifyRepository.updateNotifyStatus(id, STATUS.REFUSED.value()).failed(r -> fail(r, ctx))
         .succeeded(r -> {
           //记录拒绝通知
           Notify refuseNotify = replyNotify(notify);
@@ -232,7 +239,110 @@ public class FriendService extends BaseService {
             .succeeded(rs -> sendNotify(notify.getFromId(), refuseNotify.getId()));
           success(ctx);
         });
-    }).failed(r -> fail(ctx));
+    }).failed(r -> fail(r, ctx));
+  }
+
+  /**
+   * 添加好友分组
+   *
+   * @param name 名称
+   * @param userId 用户id
+   * @param ctx 上下文
+   */
+  public void addFriendGroup(String name, Long userId, RoutingContext ctx) {
+    FriendGroup group = new FriendGroup();
+    group.setUserId(userId);
+    friendGroupRepository.findByModel(group).then(list -> {
+      if (list != null) {
+        for (FriendGroup friendGroup : list) {
+          if (Objects.equals(name, friendGroup.getName())) {
+            error("分组名已存在", ctx);
+            return;
+          }
+        }
+        group.setOrderIndex(list.size() + 1);
+      }
+      group.setName(name);
+      group.setId(SnowflakeIdWorker.defaultNextId());
+      friendGroupRepository.save(group).succeeded(r -> success(group.getId().toString(), ctx))
+        .failed(r -> fail(r, ctx));
+    }).failed(r -> fail(r, ctx));
+  }
+
+  /**
+   * 修改分组名称
+   *
+   * @param name 分组名
+   * @param id 分组id
+   * @param userId 用户id
+   * @param ctx 上下文
+   */
+  public void updateFriendGroupName(String name, Long id, Long userId, RoutingContext ctx) {
+    FriendGroup group = new FriendGroup();
+    group.setUserId(userId);
+    friendGroupRepository.findByModel(group).then(list -> {
+      if (list != null) {
+        for (FriendGroup friendGroup : list) {
+          if (!friendGroup.getId().equals(id) && Objects.equals(name, friendGroup.getName())) {
+            error("分组名已存在", ctx);
+            return;
+          }
+        }
+      }
+      friendGroupRepository.updateGroupName(name, id).succeeded(r -> success(ctx))
+        .failed(r -> fail(r, ctx));
+    }).failed(r -> fail(r, ctx));
+  }
+
+  /**
+   * 删除好友分组
+   *
+   * @param id 分组id
+   * @param userId 用户id
+   * @param ctx 上下文
+   */
+  public void delFriendGroup(Long id, Long userId, RoutingContext ctx) {
+    friendRepository.countGroupFriend(id).failed(r -> fail(r, ctx)).succeeded(jsonArray -> {
+      if (jsonArray != null && jsonArray.getLong(0) > 1) {
+        error("该分组下存在好友，不能删除", ctx);
+      } else {
+        FriendGroup group = new FriendGroup();
+        group.setUserId(userId);
+        friendGroupRepository.findByModel(group).then(list -> {
+          if (list == null || list.size() < 2) {
+            error("至少保留一个分组", ctx);
+          } else {
+            friendGroupRepository.deleteGroup(id).succeeded(r -> success(ctx))
+              .failed(r -> fail(r, ctx));
+          }
+        }).failed(r -> fail(r, ctx));
+      }
+    });
+  }
+
+  /**
+   * 删除好友
+   *
+   * @param userId 用户id
+   * @param friendId 好友id
+   * @param ctx 上下文
+   */
+  public void delFriend(long userId, long friendId, RoutingContext ctx) {
+    friendRepository.deleteFriend(userId, friendId).failed(r -> fail(r, ctx))
+      .succeeded(r -> success(ctx));
+  }
+
+  /**
+   * 修改好友备注
+   *
+   * @param userId 用户id
+   * @param friendId 好友id
+   * @param memo 备注名
+   * @param ctx 上下文
+   */
+  public void updateFriendMemo(long userId, long friendId, String memo, RoutingContext ctx) {
+    friendRepository.updateFriendMemo(userId, friendId, memo).failed(r -> fail(r, ctx))
+      .succeeded(r -> success(ctx));
   }
 
   private ModelPromise<User> findMine(Long userId, RoutingContext ctx, Map<String, Object> result) {
@@ -240,9 +350,13 @@ public class FriendService extends BaseService {
       if (user == null) {
         ctx.fail(403);
       } else {
-        Mine mine = create(user.getId().toString(), user.getUsername(), user.getNickname(),
-          user.getSignature(), user.getAvatar());
-        mine.setStatus("online");
+        Mine mine = create(user.getId().toString(), user.getUsername(), null, user.getSignature(),
+          user.getAvatar());
+        if (sessionManager.isOnline(user.getId())) {
+          mine.setStatus(Mine.ONLINE);
+        } else {
+          mine.setStatus(Mine.OFFLINE);
+        }
         result.put("mine", mine);
       }
     });
@@ -273,7 +387,7 @@ public class FriendService extends BaseService {
       } else {
         result.put("friend", Collections.emptyList());
       }
-    }).failed(r -> fail(ctx));
+    }).failed(r -> fail(r, ctx));
   }
 
   private Mine create(String id, String username, String nickname, String sign, String avatar) {
@@ -295,8 +409,8 @@ public class FriendService extends BaseService {
   }
 
   private Mine convertToMine(JsonArray jsonArray) {
-    return create(jsonArray.getLong(0).toString(), jsonArray.getString(1), jsonArray.getString(2),
-      jsonArray.getString(3), jsonArray.getString(4));
+    return create(jsonArray.getLong(0).toString(), jsonArray.getString(1), null,
+      jsonArray.getString(2), jsonArray.getString(3));
   }
 
   private MineNotify convertToMineNotify(JsonArray jsonArray) {
@@ -310,8 +424,7 @@ public class FriendService extends BaseService {
     Mine mine = new Mine();
     mine.setId(jsonArray.getLong(6).toString());
     mine.setUsername(jsonArray.getString(7));
-    mine.setNickname(jsonArray.getString(8));
-    mine.setAvatar(jsonArray.getString(9));
+    mine.setAvatar(jsonArray.getString(8));
     notify.setFrom(mine);
     return notify;
   }

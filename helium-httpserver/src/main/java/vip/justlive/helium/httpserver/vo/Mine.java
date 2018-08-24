@@ -23,6 +23,9 @@ import lombok.Data;
 @Data
 public class Mine {
 
+  public static final String ONLINE = "online";
+  public static final String OFFLINE = "offline";
+
   private String id;
   private String username;
   private String nickname;

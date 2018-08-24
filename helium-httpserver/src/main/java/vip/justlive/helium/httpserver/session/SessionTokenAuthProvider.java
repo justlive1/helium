@@ -19,8 +19,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
+import vip.justlive.common.base.annotation.Inject;
+import vip.justlive.common.base.annotation.Singleton;
 import vip.justlive.common.web.vertx.auth.TokenAuthHandlerImpl;
-import vip.justlive.common.web.vertx.datasource.RepositoryFactory;
 import vip.justlive.helium.base.repository.UserRepository;
 import vip.justlive.helium.base.session.Session;
 import vip.justlive.helium.base.session.SessionManager;
@@ -30,14 +31,16 @@ import vip.justlive.helium.base.session.SessionManager;
  *
  * @author wubo
  */
+@Singleton
 public class SessionTokenAuthProvider implements AuthProvider {
 
   private final SessionManager sessionManager;
   private final UserRepository userRepository;
 
-  public SessionTokenAuthProvider(SessionManagerImpl sessionManager) {
+  @Inject
+  public SessionTokenAuthProvider(SessionManager sessionManager, UserRepository userRepository) {
     this.sessionManager = sessionManager;
-    this.userRepository = RepositoryFactory.repository(UserRepository.class);
+    this.userRepository = userRepository;
   }
 
   @Override

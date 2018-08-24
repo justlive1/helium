@@ -4,6 +4,16 @@ IM
 
 ## 介绍
   - 基于Vert.x开发的IM服务端
+  - 演示地址： http://www.justlive.vip
+
+## ui
+略 （简单修改了layim的ui）
+
+## 后台实现
+  - 基于Vert.x搭建项目
+  - 使用Event Bus Bridge将Event Bus扩展到客户端的JavaScript运行环境
+  - 短连接和长连接配合
+
 
 ## 相关原理
 

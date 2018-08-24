@@ -53,4 +53,26 @@ public interface SessionManager {
    */
   void remove(String sessionId);
 
+  /**
+   * 用户是否登录
+   *
+   * @param userId 用户id
+   * @return true是登录
+   */
+  boolean isOnline(Long userId);
+
+  /**
+   * 用户上线
+   *
+   * @param userId 用户id
+   */
+  void login(Long userId);
+
+  /**
+   * 用户下线
+   *
+   * @param userId 用户id
+   */
+  void logout(Long userId);
+
 }

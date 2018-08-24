@@ -49,12 +49,6 @@ public class User extends AbstractUser implements Serializable {
   private String password;
 
   /**
-   * 昵称
-   */
-  @Column
-  private String nickname;
-
-  /**
    * 签名
    */
   @Column

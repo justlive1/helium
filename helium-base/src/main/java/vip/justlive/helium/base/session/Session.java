@@ -54,16 +54,21 @@ public abstract class Session implements Serializable {
   public abstract boolean isActive();
 
   /**
-   * 关闭session
-   */
-  public abstract void close();
-
-  /**
    * 向session写入消息
    *
    * @param msg 消息
    * @return true写入成功
    */
   public abstract boolean write(Object msg);
+
+  /**
+   * 上线
+   */
+  public abstract void login();
+
+  /**
+   * 下线
+   */
+  public abstract void logout();
 
 }

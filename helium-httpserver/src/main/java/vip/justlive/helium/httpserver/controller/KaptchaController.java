@@ -21,9 +21,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import vip.justlive.common.base.annotation.Inject;
 import vip.justlive.common.web.vertx.annotation.VertxRoute;
 import vip.justlive.common.web.vertx.annotation.VertxRouteMapping;
-import vip.justlive.helium.base.util.KaptchaUtils;
 
 /**
  * Kaptcha 路由
@@ -35,8 +35,9 @@ public class KaptchaController {
 
   private final DefaultKaptcha kaptcha;
 
-  public KaptchaController() {
-    this.kaptcha = KaptchaUtils.googleKaptcha();
+  @Inject
+  public KaptchaController(DefaultKaptcha kaptcha) {
+    this.kaptcha = kaptcha;
   }
 
   /**

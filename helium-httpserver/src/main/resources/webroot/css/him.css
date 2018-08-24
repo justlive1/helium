@@ -12,6 +12,60 @@
  * the License.
  */
 
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+
+.dropdown-menu li {
+  list-style: none;
+  padding: 10px 10px;
+  min-width: 80px;
+  margin: 0;
+  font-family: "微软雅黑";
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.dropdown-divider {
+
+}
+
+.layui-layim, .layui-layim-min {
+  padding-bottom: 40px !important;
+  z-index: 100 !important;
+}
+
+.layui-layim-min {
+  border: 0 !important;
+}
+
+.layui-layim-info .layui-layim-status {
+  line-height: 15px;
+}
+
+.layui-layim-avatar-cicle {
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.layui-layim-info.layui-layim-avatar-info {
+}
+
+.layui-layim-info .layui-layim-user {
+  height: 30px;
+}
+
 .back {
   cursor: pointer;
 }
@@ -146,4 +200,156 @@
   right: 0;
   top: 12px;
   color: #999;
+}
+
+.l-btn {
+  display: inline-block;
+  outline: none;
+  resize: none;
+  border: none;
+  padding: 5px 10px;
+  background: #79C48C;
+  color: #fff;
+  border: solid 1px #79C48C;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.l-btn:hover {
+  background: #79C48C;
+  animation: anniu 1s infinite;
+}
+
+.l-btn:active {
+  box-shadow: 0 2px 3px rgba(0, 0, 0, .2) inset;
+}
+
+.hidden {
+  display: none;
+}
+
+.tailoring-container, .tailoring-container div, .tailoring-container p {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+.tailoring-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+}
+
+.tailoring-container .black-cloth {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  opacity: .9;
+  z-index: 1001;
+}
+
+.tailoring-container .tailoring-content {
+  position: absolute;
+  width: 500px;
+  height: 400px;
+  background: #fff;
+  z-index: 1002;
+  left: 0;
+  top: 0;
+  padding: 10px;
+}
+
+.tailoring-content-one {
+  height: 40px;
+  width: 100%;
+  border-bottom: 1px solid #DDD;
+}
+
+.tailoring-content .choose-btn {
+  float: left;
+}
+
+.tailoring-content .close-tailoring {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  background: #eee;
+  color: #fff;
+  font-size: 22px;
+  text-align: center;
+  line-height: 30px;
+  float: right;
+  cursor: pointer;
+}
+
+.tailoring-content .close-tailoring:hover {
+  background: #ccc;
+}
+
+.tailoring-content .tailoring-content-two {
+  width: 100%;
+  height: 290px;
+  position: relative;
+  padding: 5px 0;
+}
+
+.tailoring-content .tailoring-box-parcel {
+  width: 335px;
+  height: 280px;
+  position: absolute;
+  left: 0;
+  border: solid 1px #ddd;
+}
+
+.tailoring-content .preview-box-parcel {
+  display: inline-block;
+  width: 140px;
+  height: 280px;
+  position: absolute;
+  right: 0;
+  padding: 4px 14px;
+}
+
+.preview-box-parcel p {
+  color: #555;
+}
+
+.previewImg {
+  width: 118px;
+  height: 118px;
+  overflow: hidden;
+}
+
+.preview-box-parcel .square {
+  margin-top: 10px;
+  border: solid 1px #ddd;
+}
+
+.preview-box-parcel .circular {
+  border-radius: 100%;
+  margin-top: 10px;
+  border: solid 1px #ddd;
+}
+
+.tailoring-content .tailoring-content-three {
+  width: 100%;
+  height: 40px;
+  border-top: 1px solid #DDD;
+  padding-top: 10px;
+}
+
+.sureCut {
+  float: right;
+}
+
+.cropper-point.point-se {
+  height: 5px;
+  opacity: .75;
+  width: 5px;
 }
