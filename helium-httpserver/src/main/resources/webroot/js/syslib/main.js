@@ -223,11 +223,27 @@ layui.define(['jquery', 'layer', 'layim'], function (exports) {
         id: friend.id,
         type: "friend",
         content: data.body.data,
-        cid: 0,
+        cid: data.headers.mid,
         mine: false,
         fromid: friend.id,
         timestamp: Number(data.headers.timestamp)
       });
+      main.recordReceiveMsgId(data.body.to, data.headers.mid);
+    },
+
+    recordReceiveMsgId: function (uid, mid) {
+      var msgids = localStorage.getItem("msgids" + uid);
+      if (!msgids) {
+        msgids = [];
+      } else {
+        msgids = JSON.parse(msgids);
+      }
+      if (msgids.indexOf(mid) > -1) {
+        return false;
+      }
+      msgids.push(mid);
+      localStorage.setItem("msgids" + uid, JSON.stringify(msgids));
+      return true;
     },
 
     receiveNotifyHandler: function (data) {
@@ -477,19 +493,21 @@ layui.define(['jquery', 'layer', 'layim'], function (exports) {
     offlineMsgHandler: function (err, reply) {
       if (reply && reply.body && reply.body.success) {
         layui.$.each(reply.body.data, function (i, t) {
-          var friend = layui.$("body").data("friends")[t.fromId];
-          layui.layim.getMessage({
-            name: friend.name,
-            username: friend.username,
-            avatar: friend.avatar,
-            id: friend.id,
-            type: "friend",
-            content: t.content,
-            cid: t.id,
-            mine: false,
-            fromid: friend.id,
-            timestamp: t.timestamp
-          });
+          if (main.recordReceiveMsgId(t.toId, t.id)) {
+            var friend = layui.$("body").data("friends")[t.fromId];
+            layui.layim.getMessage({
+              name: friend.name,
+              username: friend.username,
+              avatar: friend.avatar,
+              id: friend.id,
+              type: "friend",
+              content: t.content,
+              cid: t.id,
+              mine: false,
+              fromid: friend.id,
+              timestamp: t.timestamp
+            });
+          }
         });
       }
     },

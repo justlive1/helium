@@ -22,7 +22,7 @@
 
   <link rel='Shortcut Icon' type='image/x-icon' href="/static/image/window.ico"/>
   <link href="/static/css/animate.css" rel="stylesheet"/>
-  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
   <link href="/static/css/default.css" rel="stylesheet">
   <link href="/static/js/layui-v2.3.0/css/layui.css" rel="stylesheet">
   <link href="/static/css/him.css" rel="stylesheet">
@@ -30,8 +30,8 @@
   <script type="text/javascript" src="/static/js/layui-v2.3.0/layui.js"></script>
   <script type="text/javascript" src="/static/js/syslib/win10.js"></script>
   <script type="text/javascript" src="/static/js/syslib/contextify.js"></script>
-  <script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
-  <script src="https://cdn.bootcss.com/vertx/3.5.1/vertx-eventbus.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vertx/3.5.1/vertx-eventbus.min.js"></script>
 </head>
 <body>
 <div id="win10">
@@ -45,6 +45,14 @@
       <div class="shortcut" onclick="window.open('https://gitee.com/justlive1')">
         <img class="icon" src="/static/image/gitee.png"/>
         <div class="title">码云</div>
+      </div>
+      <div class="shortcut" onclick="window.open('http://www.justlive.vip/blog');">
+        <img class="icon" src="/static/image/doc.png"/>
+        <div class="title">博客</div>
+      </div>
+      <div class="shortcut" onclick="window.open('http://www.justlive.vip/library');">
+        <img class="icon" src="/static/image/ibooks.png"/>
+        <div class="title">一角书屋</div>
       </div>
       <div class="shortcut win10-open-window" data-url="http://www.justlive.vip/center/">
         <i class="icon fa fa-fw fa-sliders green"></i>
@@ -64,6 +72,9 @@
       </div>
       <div class="item" onclick="window.open('https://gitee.com/justlive1');">
         <img class="icon" src="/static/image/gitee.png"/>码云
+      </div>
+      <div class="item" onclick="window.open('http://www.justlive.vip/blog');">
+        <img class="icon" src="/static/image/doc.png"/>博客
       </div>
       <div class="item" onclick="layui.main.openHimView();">
         <img class="icon" src="/static/image/messages.png"/>IM

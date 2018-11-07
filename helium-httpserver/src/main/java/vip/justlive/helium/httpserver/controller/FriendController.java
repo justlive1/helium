@@ -68,6 +68,9 @@ public class FriendController extends BaseController {
   /**
    * 添加好友
    *
+   * @param groupId 分组id
+   * @param to to
+   * @param remark 备注
    * @param ctx 上下文
    */
   @VertxRouteMapping("/addFriend")

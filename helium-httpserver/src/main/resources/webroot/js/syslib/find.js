@@ -35,11 +35,11 @@ layui.define(['layim', 'laypage', 'form'], function (exports) {
         async: false,
         success: function (resp) {
           if (resp.success) {
-            this.findData = resp.data;
+            find.findData = resp.data;
             var html = layui.laytpl(layui.$("#find-view-tpl").html()).render({
               legend: title,
               type: layui.$("#type").val(),
-              data: this.findData.items
+              data: find.findData.items
             });
             layui.$('#find-result-view').html(html);
           } else {
@@ -56,6 +56,7 @@ layui.define(['layim', 'laypage', 'form'], function (exports) {
       var _this = this;
       //监听查找按钮
       layui.$("#find").click(function () {
+        _this.findFriends("查找结果", 1);
         layui.laypage.render({
           elem: 'page-view',
           count: _this.findData.totalNumber,
